@@ -11,6 +11,36 @@ const Map = dynamic(() => import("@/components/Map"), {
   loading: () => <div className="w-full h-[500px] md:h-[600px] rounded-[32px] bg-gray-100 flex items-center justify-center text-gray-400 font-medium">Memuat Peta...</div>
 });
 
+const KosTags = () => (
+  <div className="flex flex-wrap gap-1.5 mb-3">
+    <div className="flex items-center space-x-1.5 bg-[#F6F6F6] px-2.5 py-1 rounded-lg">
+      <svg className="w-4 h-4 text-[#555555]" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 7.3V13H8V9.6l1.8-.7" />
+      </svg>
+      <span className="text-[13px] font-medium text-[#555555]">7 menit ke halte bus</span>
+    </div>
+    <div className="flex items-center space-x-1.5 bg-[#F6F6F6] px-2.5 py-1 rounded-lg">
+      <svg className="w-4 h-4 text-[#555555]" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" />
+      </svg>
+      <span className="text-[13px] font-medium text-[#555555]">untuk profesional</span>
+    </div>
+    <div className="flex items-center space-x-1.5 bg-[#F6F6F6] px-2.5 py-1 rounded-lg">
+      <svg className="w-4 h-4 text-[#555555]" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 10c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+      </svg>
+      <span className="text-[13px] font-medium text-[#555555]">trisakti</span>
+    </div>
+    <div className="flex items-center space-x-1.5 bg-[#F6F6F6] px-2.5 py-1 rounded-lg">
+      <svg className="w-4 h-4 text-[#555555]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <circle cx="12" cy="10" r="3" />
+      </svg>
+      <span className="text-[13px] font-medium text-[#555555]">untar</span>
+    </div>
+  </div>
+);
+
 export default function Home() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
@@ -58,7 +88,7 @@ export default function Home() {
         <div className="relative w-full rounded-[32px] overflow-hidden aspect-[4/3] md:aspect-[16/10] bg-gray-100 shadow-2xl">
           {/* Background Image */}
           <Image
-            src="/kos-mayapada-green.png"
+            src="/kos-mayapada.webp"
             alt="Kos Green Mayapada"
             fill
             className="object-cover"
@@ -280,22 +310,65 @@ export default function Home() {
 
         {/* Popular Kos Section */}
         <section className="w-full mt-24">
-          <div className="flex flex-row justify-start items-center mb-8 gap-3">
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight">Kos Populer di</h2>
+          <div className="flex flex-col items-center mb-12 text-center">
+            <span className="text-sm font-medium uppercase mb-3 text-gray-800">JELAJAHI KOS POPULER</span>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium leading-[1.3] text-[#111111] mb-8">
+              Dari kos hemat hingga eksklusif — semua ada dalam satu tempat.
+            </h2>
 
-            <div className="relative inline-block w-auto">
-              <select className="appearance-none w-auto bg-white border border-gray-300 hover:border-gray-400 px-4 py-1.5 pr-10 rounded-full font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-black cursor-pointer shadow-sm">
-                <option>Jakarta Selatan</option>
-                <option>Jakarta Pusat</option>
-                <option>Jakarta Barat</option>
-                <option>Jakarta Timur</option>
-                <option>Jakarta Utara</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
+            {/* Pill Search Form */}
+            <div className="flex flex-col md:flex-row items-center bg-white md:border border-gray-800 md:rounded-full md:p-1.5 justify-center mt-4 w-full md:w-auto gap-3 md:gap-0">
+              <div className="relative w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-4 py-3 md:py-0 md:pl-6 md:pr-4">
+                <select className="appearance-none w-full bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
+                  <option>Lokasi</option>
+                  <option>Jakarta Selatan</option>
+                  <option>Jakarta Pusat</option>
+                  <option>Jakarta Barat</option>
+                  <option>Jakarta Timur</option>
+                  <option>Jakarta Utara</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
               </div>
+
+              <div className="hidden md:block h-6 w-px bg-gray-300 mx-2"></div>
+
+              <div className="relative w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-4 py-3 md:py-0 md:px-4">
+                <select className="appearance-none w-full bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
+                  <option>Tipe Kos</option>
+                  <option>Putra</option>
+                  <option>Putri</option>
+                  <option>Campuran</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
+              </div>
+
+              <div className="hidden md:block h-6 w-px bg-gray-300 mx-2"></div>
+
+              <div className="relative w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-4 py-3 md:py-0 md:px-4">
+                <select className="appearance-none w-full bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
+                  <option>Harga</option>
+                  <option>&lt; 1 Juta</option>
+                  <option>1 - 2 Juta</option>
+                  <option>&gt; 2 Juta</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
+              </div>
+
+              <button className="w-full md:w-auto bg-black text-white px-8 py-3 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors md:ml-4">
+                Cari Kos
+              </button>
             </div>
           </div>
 
@@ -306,12 +379,13 @@ export default function Home() {
                 <Image src="/kos-1.jpg" alt="Kos Mayapada" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
               <h3 className="text-xl font-bold mb-1">Kos Mayapada</h3>
-              <div className="flex items-center text-gray-500 mb-3 text-sm font-medium space-x-1.5">
+              <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
                 <span>Cilandak, Jakarta Selatan</span>
               </div>
+              <KosTags />
               <div className="text-lg">
-                <span className="font-bold">Rp 1.200.000</span>
+                <span className="font-bold text-[#E53E3E]">Rp 1.200.000</span>
                 <span className="font-medium">/bulan</span>
               </div>
             </div>
@@ -322,12 +396,13 @@ export default function Home() {
                 <Image src="/kos-2.jpg" alt="Kos Waduk" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
               <h3 className="text-xl font-bold mb-1">Kos Waduk</h3>
-              <div className="flex items-center text-gray-500 mb-3 text-sm font-medium space-x-1.5">
+              <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
                 <span>Cilandak, Jakarta Selatan</span>
               </div>
+              <KosTags />
               <div className="text-lg">
-                <span className="font-bold">Rp 950.000</span>
+                <span className="font-bold text-[#E53E3E]">Rp 950.000</span>
                 <span className="font-medium">/bulan</span>
               </div>
             </div>
@@ -338,12 +413,13 @@ export default function Home() {
                 <Image src="/kos-3.jpg" alt="Kos New Cilandak" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
               <h3 className="text-xl font-bold mb-1">Kos New Cilandak</h3>
-              <div className="flex items-center text-gray-500 mb-3 text-sm font-medium space-x-1.5">
+              <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
                 <span>Cilandak, Jakarta Selatan</span>
               </div>
+              <KosTags />
               <div className="text-lg">
-                <span className="font-bold">Rp 1.500.000</span>
+                <span className="font-bold text-[#E53E3E]">Rp 1.500.000</span>
                 <span className="font-medium">/bulan</span>
               </div>
             </Link>
@@ -354,12 +430,13 @@ export default function Home() {
                 <Image src="/kos-4.jpg" alt="Kos Green Mayapada" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
               <h3 className="text-xl font-bold mb-1">Kos Green Mayapada</h3>
-              <div className="flex items-center text-gray-500 mb-3 text-sm font-medium space-x-1.5">
+              <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
                 <span>Cilandak, Jakarta Selatan</span>
               </div>
+              <KosTags />
               <div className="text-lg">
-                <span className="font-bold">Rp 980.000</span>
+                <span className="font-bold text-[#E53E3E]">Rp 980.000</span>
                 <span className="font-medium">/bulan</span>
               </div>
             </div>
@@ -391,6 +468,76 @@ export default function Home() {
         </section>
       </main>
 
+      {/* Footer */}
+      <footer className="w-full px-[50px] py-16 mt-10 bg-white">
+        <div className="w-full">
+          {/* Top section */}
+          <div className="flex flex-col md:flex-row justify-between mb-16 gap-10">
+            {/* Logo and Description */}
+            <div className="max-w-sm">
+              <div className="mb-6">
+                <Image
+                  src="/logo-carikos.svg"
+                  alt="Carikos Logo"
+                  width={140}
+                  height={46}
+                  className="h-8 md:h-10 w-auto"
+                />
+              </div>
+              <p className="text-[#888888] text-sm md:text-[15px] leading-relaxed font-medium">
+                Temukan kos populer di berbagai lokasi dengan pilihan sesuai kebutuhan dan budgetmu.
+              </p>
+            </div>
+
+            {/* Links Columns */}
+            <div className="flex gap-16 md:gap-24 pr-4 lg:pr-10">
+              {/* Menu Links */}
+              <div>
+                <h3 className="text-black font-bold text-[15px] mb-6 tracking-wide">MENU</h3>
+                <ul className="space-y-4 text-sm md:text-[15px] text-[#888888] font-medium">
+                  <li><a href="#" className="hover:text-black transition-colors">Home</a></li>
+                  <li><a href="#" className="hover:text-black transition-colors">Cari Kos</a></li>
+                  <li><a href="#" className="hover:text-black transition-colors">Maps</a></li>
+                </ul>
+              </div>
+
+              {/* FAQ Links */}
+              <div>
+                <h3 className="text-black font-bold text-[15px] mb-6 tracking-wide">FAQ</h3>
+                <ul className="space-y-4 text-sm md:text-[15px] text-[#888888] font-medium">
+                  <li><a href="#" className="hover:text-black transition-colors">Privacy Policy</a></li>
+                  <li><a href="#" className="hover:text-black transition-colors">Terms & Condition</a></li>
+                  <li><a href="#" className="hover:text-black transition-colors">Help</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom section (Copyright & Socials) */}
+          <div className="pt-8 border-t border-gray-300 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-[#888888] font-medium">
+              2026 kosku All rights reserved
+            </p>
+
+            <div className="flex items-center space-x-6 text-[#888888]">
+              {/* Tiktok Icon */}
+              <a href="#" className="hover:text-black transition-colors">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                </svg>
+              </a>
+              {/* Instagram Icon */}
+              <a href="#" className="hover:text-black transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

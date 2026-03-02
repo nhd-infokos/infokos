@@ -6,20 +6,36 @@ import { useState } from "react";
 
 export default function DetailKosNewCilandak() {
     const [activeModal, setActiveModal] = useState<string | null>(null);
+    const [activeMobileCard, setActiveMobileCard] = useState<'details' | 'facilities' | null>(null);
 
     return (
         <div className="min-h-screen relative w-full bg-black text-black font-sans selection:bg-black selection:text-white overflow-hidden">
-            {/* Background Image */}
+            {/* Background Image Container */}
             <div className="absolute inset-0 z-0">
-                <Image
-                    src="/kos-new-cilandak.png"
-                    alt="Kos New Cilandak"
-                    fill
-                    className="object-cover"
-                    priority
-                />
+                {/* Desktop Background */}
+                <div className="hidden md:block absolute inset-0">
+                    <Image
+                        src="/kos-new-cilandak.png"
+                        alt="Kos New Cilandak"
+                        fill
+                        className="object-cover"
+                        priority
+                    />
+                </div>
+
+                {/* Mobile Background */}
+                <div className="block md:hidden absolute inset-0">
+                    <Image
+                        src="/kos-new-cilandak-mobile.png"
+                        alt="Kos New Cilandak Mobile"
+                        fill
+                        className="object-cover"
+                        priority
+                    />
+                </div>
+
                 {/* Subtle overlay to ensure text readability if needed */}
-                <div className="absolute inset-0 bg-black/10"></div>
+                <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
             </div>
 
             {/* Navigation Header (Overlay) */}
@@ -55,8 +71,14 @@ export default function DetailKosNewCilandak() {
             <main className="relative z-20 w-full h-[calc(100vh-100px)] pointer-events-none">
 
                 {/* Left Glass Card - Kos Details */}
-                <div className="absolute top-10 left-[50px] p-6 md:p-8 rounded-[24px] bg-black/40 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] md:w-80 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] pointer-events-auto">
-                    <h2 className="text-xl md:text-2xl font-bold mb-6 tracking-tight">Kos New Cilandak</h2>
+                <div className={`absolute top-10 left-6 md:left-[50px] p-6 md:p-8 rounded-[24px] bg-black/40 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] md:w-80 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] pointer-events-auto transition-opacity duration-300 ${activeMobileCard === 'details' ? 'opacity-100 z-40' : 'opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto z-10'}`}>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl md:text-2xl font-bold tracking-tight">Kos New Cilandak</h2>
+                        {/* Mobile Close Button */}
+                        <button onClick={() => setActiveMobileCard(null)} className="md:hidden p-1 bg-white/10 rounded-full hover:bg-white/20">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
 
                     <div className="space-y-4 text-xs md:text-sm">
                         <div className="flex justify-between items-center">
@@ -78,8 +100,14 @@ export default function DetailKosNewCilandak() {
                 </div>
 
                 {/* Right Glass Card - Facilities */}
-                <div className="absolute top-10 right-[50px] p-6 md:p-8 rounded-[24px] bg-black/40 backdrop-blur-2xl border border-white/20 hidden lg:block w-72 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] pointer-events-auto">
-                    <h2 className="text-xl md:text-2xl font-bold mb-6 tracking-tight">Fasilitas Kos</h2>
+                <div className={`absolute top-10 right-6 md:right-[50px] md:left-auto left-6 p-6 md:p-8 rounded-[24px] bg-black/40 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] lg:w-72 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] pointer-events-auto transition-opacity duration-300 ${activeMobileCard === 'facilities' ? 'opacity-100 z-40' : 'opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-10'}`}>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl md:text-2xl font-bold tracking-tight">Fasilitas Kos</h2>
+                        {/* Mobile Close Button */}
+                        <button onClick={() => setActiveMobileCard(null)} className="md:hidden p-1 bg-white/10 rounded-full hover:bg-white/20 relative z-50 pointer-events-auto">
+                            <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
 
                     <div className="space-y-4">
                         <div className="flex items-center space-x-3">
@@ -135,7 +163,7 @@ export default function DetailKosNewCilandak() {
                 {/* Map Markers (Pointer Events Auto to allow hovering/clicking) */}
 
                 {/* Marker 1 (Upper Balcony) */}
-                <div className="absolute top-[60%] left-[92%] transform -translate-x-1/2 -translate-y-1/2 hidden md:flex flex-col items-center z-20 animate-[float_3s_ease-in-out_infinite] relative pointer-events-auto">
+                <div className="absolute top-[60%] left-[92%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 animate-[float_3s_ease-in-out_infinite] relative pointer-events-auto">
                     <div className="w-8 h-8 md:w-12 md:h-12 relative flex items-center justify-center group cursor-pointer">
                         <Image src="/icon-markers.svg" alt="Marker" width={48} height={48} className="absolute inset-0 w-full h-full drop-shadow-lg transition-opacity duration-300 group-hover:opacity-0" />
 
@@ -152,7 +180,7 @@ export default function DetailKosNewCilandak() {
 
                 {/* Marker 2 (Living Room Downstairs) */}
                 <div
-                    className="absolute top-[46%] left-[110%] transform -translate-x-1/2 -translate-y-1/2 hidden md:flex flex-col items-center z-20 animate-[float_4s_ease-in-out_infinite_0.5s] relative pointer-events-auto"
+                    className="absolute top-[46%] left-[110%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 animate-[float_4s_ease-in-out_infinite_0.5s] relative pointer-events-auto"
                     onClick={() => setActiveModal("ruang-tamu")}
                 >
                     <div className="w-8 h-8 md:w-12 md:h-12 relative flex items-center justify-center group cursor-pointer">
@@ -233,6 +261,22 @@ export default function DetailKosNewCilandak() {
                         </div>
                     </div>
                 )}
+
+                {/* Mobile Bottom Navigation Pills */}
+                <div className="absolute bottom-6 left-0 right-0 flex md:hidden justify-center items-center gap-3 px-4 z-50 pointer-events-auto">
+                    <button
+                        onClick={() => setActiveMobileCard(activeMobileCard === 'details' ? null : 'details')}
+                        className={`px-5 py-2.5 rounded-full backdrop-blur-md border border-white/20 text-white font-medium text-[13px] sm:text-sm transition-colors shadow-lg ${activeMobileCard === 'details' ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}
+                    >
+                        Kos Information
+                    </button>
+                    <button
+                        onClick={() => setActiveMobileCard(activeMobileCard === 'facilities' ? null : 'facilities')}
+                        className={`px-6 py-2.5 rounded-full backdrop-blur-md border border-white/20 text-white font-medium text-[13px] sm:text-sm transition-colors shadow-lg ${activeMobileCard === 'facilities' ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}
+                    >
+                        Fasilitas
+                    </button>
+                </div>
 
             </main>
         </div>

@@ -20,9 +20,17 @@
 }
 
 @keyframes float {
-  0% { transform: translate(-50%, -50%) translateY(0px); }
-  50% { transform: translate(-50%, -50%) translateY(-10px); }
-  100% { transform: translate(-50%, -50%) translateY(0px); }
+  0% {
+    transform: translate(-50%, -50%) translateY(0px);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) translateY(-10px);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translateY(0px);
+  }
 }
 
 body {
@@ -31,3 +39,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Hide Next.js Development Build Indicator */
+nextjs-portal {
+  display: none !important;
+}
