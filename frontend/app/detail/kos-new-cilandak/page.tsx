@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { Bed, Bathtub, Television, Wind, WifiHigh, Thermometer, Martini } from "@phosphor-icons/react";
 
 export default function DetailKosNewCilandak() {
     const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -41,15 +42,18 @@ export default function DetailKosNewCilandak() {
             {/* Navigation Header (Overlay) */}
             <nav className="relative z-50 flex items-center justify-between px-[50px] py-6 w-full">
                 <div className="flex items-center">
-                    <Link href="/">
+                    <Link href="/" className="flex items-center gap-3">
                         <Image
                             src="/logo-carikos.svg"
                             alt="Carikos Logo"
-                            width={120}
-                            height={40}
+                            width={44}
+                            height={38}
                             priority
                             className="w-auto h-8 sm:h-10 cursor-pointer"
                         />
+                        <span className="text-[32px] font-bold tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>
+                            Kosku
+                        </span>
                     </Link>
                 </div>
 
@@ -112,48 +116,35 @@ export default function DetailKosNewCilandak() {
                     <div className="space-y-4">
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <svg className="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
+                                <Bed className="w-4 h-4 text-black" weight="fill" />
                             </div>
                             <span className="font-bold text-sm">Kasur</span>
                         </div>
 
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <svg className="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
+                                <Bed className="w-4 h-4 text-black" weight="fill" />
                             </div>
                             <span className="font-bold text-sm">Bantal</span>
                         </div>
 
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <svg className="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
+                                <Bathtub className="w-4 h-4 text-black" weight="fill" />
                             </div>
                             <span className="font-bold text-sm">Kamar Mandi</span>
                         </div>
 
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <svg className="w-4 h-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
-                                    <polyline points="17 2 12 7 7 2"></polyline>
-                                </svg>
+                                <Television className="w-4 h-4 text-black" weight="bold" />
                             </div>
                             <span className="font-bold text-sm">TV</span>
                         </div>
 
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <svg className="w-4 h-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="4" y1="12" x2="20" y2="12"></line>
-                                    <line x1="4" y1="8" x2="20" y2="8"></line>
-                                    <line x1="4" y1="16" x2="20" y2="16"></line>
-                                </svg>
+                                <Wind className="w-4 h-4 text-black" weight="bold" />
                             </div>
                             <span className="font-bold text-sm">AC</span>
                         </div>
@@ -238,22 +229,22 @@ export default function DetailKosNewCilandak() {
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
                                     {/* Smart TV 4K */}
                                     <div className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2AF56E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+                                        <Television weight="bold" className="w-4 h-4 text-[#2AF56E]" />
                                         <span className="text-[11px] md:text-xs font-semibold text-gray-200">Smart TV 4K</span>
                                     </div>
                                     {/* High-Speed WiFi */}
                                     <div className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2AF56E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                                        <WifiHigh weight="bold" className="w-4 h-4 text-[#2AF56E]" />
                                         <span className="text-[11px] md:text-xs font-semibold text-gray-200">High-Speed WiFi</span>
                                     </div>
                                     {/* Climate Control */}
                                     <div className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2AF56E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="12" y1="2" x2="15" y2="5"></line><line x1="12" y1="2" x2="9" y2="5"></line><line x1="12" y1="22" x2="15" y2="19"></line><line x1="12" y1="22" x2="9" y2="19"></line><line x1="3.34" y1="7" x2="20.66" y2="17"></line><line x1="3.34" y1="7" x2="6.35" y2="8.61"></line><line x1="3.34" y1="7" x2="2.7" y2="10.8"></line><line x1="20.66" y1="17" x2="17.65" y2="15.39"></line><line x1="20.66" y1="17" x2="21.3" y2="13.2"></line><line x1="3.34" y1="17" x2="20.66" y2="7"></line><line x1="3.34" y1="17" x2="6.35" y2="15.39"></line><line x1="3.34" y1="17" x2="2.7" y2="13.2"></line><line x1="20.66" y1="7" x2="17.65" y2="8.61"></line><line x1="20.66" y1="7" x2="21.3" y2="10.8"></line></svg>
+                                        <Thermometer weight="bold" className="w-4 h-4 text-[#2AF56E]" />
                                         <span className="text-[11px] md:text-xs font-semibold text-gray-200">Climate Control</span>
                                     </div>
                                     {/* Minibar */}
                                     <div className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2AF56E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="4" y1="9" x2="20" y2="9"></line><line x1="9" y1="14" x2="9" y2="18"></line></svg>
+                                        <Martini weight="bold" className="w-4 h-4 text-[#2AF56E]" />
                                         <span className="text-[11px] md:text-xs font-semibold text-gray-200">Minibar</span>
                                     </div>
                                 </div>

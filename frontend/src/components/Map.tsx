@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
@@ -17,17 +19,28 @@ const createPriceIcon = (price: string) => {
 
 export default function Map() {
     const router = useRouter();
+    const [mapId, setMapId] = useState("");
+
+    // Use useEffect to ensure the key is only created after the component mounts on the client
+    // This prevents hydration mismatches and guarantees a unique key for each mount
+    useEffect(() => {
+        setMapId("map-" + Date.now());
+    }, []);
 
     // Center of Jakarta Selatan roughly
     const position: [number, number] = [-6.2615, 106.8106];
 
+    if (!mapId) return <div className="w-full h-[500px] md:h-[600px] rounded-[32px] bg-gray-100 flex items-center justify-center text-gray-400 font-medium">Memuat Peta...</div>;
+
     return (
         <div className="w-full h-[500px] md:h-[600px] rounded-[32px] overflow-hidden shadow-sm border border-gray-100 relative z-0">
             <MapContainer
+                key={mapId}
                 center={position}
                 zoom={13}
                 scrollWheelZoom={false}
                 className="w-full h-full"
+                id="map"
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
