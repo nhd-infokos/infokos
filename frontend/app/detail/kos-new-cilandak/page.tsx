@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Bed, Bathtub, Television, Wind, WifiHigh, Thermometer, Martini } from "@phosphor-icons/react";
+import { Bed, Bathtub, Television, Wind, WifiHigh, Thermometer, Martini, Buildings, GenderIntersex, Train, BagSimple, ShoppingBag } from "@phosphor-icons/react";
 
 export default function DetailKosNewCilandak() {
     const [activeModal, setActiveModal] = useState<string | null>(null);
-    const [activeMobileCard, setActiveMobileCard] = useState<'details' | 'facilities' | null>(null);
+    const [activeMobileCard, setActiveMobileCard] = useState<'details' | 'facilities' | 'map' | null>(null);
 
     return (
         <div className="min-h-screen relative w-full bg-black text-black font-sans selection:bg-black selection:text-white overflow-hidden">
@@ -16,7 +16,7 @@ export default function DetailKosNewCilandak() {
                 {/* Desktop Background */}
                 <div className="hidden md:block absolute inset-0">
                     <Image
-                        src="/kos-new-cilandak.png"
+                        src="/Pal Batu 271.png"
                         alt="Kos New Cilandak"
                         fill
                         className="object-cover"
@@ -27,7 +27,7 @@ export default function DetailKosNewCilandak() {
                 {/* Mobile Background */}
                 <div className="block md:hidden absolute inset-0">
                     <Image
-                        src="/kos-new-cilandak-mobile.png"
+                        src="/Pal Batu 271-mobile.png"
                         alt="Kos New Cilandak Mobile"
                         fill
                         className="object-cover"
@@ -41,7 +41,7 @@ export default function DetailKosNewCilandak() {
 
             {/* Navigation Header (Overlay) */}
             <nav className="relative z-50 flex items-center justify-between px-[50px] py-6 w-full">
-                <div className="flex items-center">
+                <div className="flex items-center flex-1">
                     <Link href="/" className="flex items-center gap-3">
                         <Image
                             src="/logo-carikos.svg"
@@ -58,7 +58,7 @@ export default function DetailKosNewCilandak() {
                 </div>
 
                 {/* Links / Navigation */}
-                <div className="hidden sm:flex items-center space-x-2">
+                <div className="hidden sm:flex justify-center items-center space-x-2">
                     <Link href="/" className="px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors">
                         Home
                     </Link>
@@ -69,37 +69,65 @@ export default function DetailKosNewCilandak() {
                         Maps
                     </a>
                 </div>
+
+                {/* Right Action Button */}
+                <div className="flex items-center justify-end flex-1 hidden sm:flex">
+                    <button className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors shadow-lg shadow-black/20">
+                        <span>Daftarkan Kosmu Disini</span>
+                        <Buildings className="w-5 h-5" weight="duotone" />
+                    </button>
+                </div>
             </nav>
 
             {/* Main Content Area */}
             <main className="relative z-20 w-full h-[calc(100vh-100px)] pointer-events-none">
 
                 {/* Left Glass Card - Kos Details */}
-                <div className={`absolute top-10 left-6 md:left-[50px] p-6 md:p-8 rounded-[24px] bg-black/40 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] md:w-80 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] pointer-events-auto transition-opacity duration-300 ${activeMobileCard === 'details' ? 'opacity-100 z-40' : 'opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto z-10'}`}>
+                <div className={`absolute top-10 left-6 md:left-[50px] p-6 md:p-8 rounded-[24px] bg-black/40 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] md:w-80 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] pointer-events-auto transition-opacity duration-300 flex flex-col ${activeMobileCard === 'details' ? 'opacity-100 z-40' : 'opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto z-10'}`}>
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl md:text-2xl font-bold tracking-tight">Kos New Cilandak</h2>
+                        <h2 className="text-xl md:text-2xl font-bold tracking-tight">Kost Pal batu 271</h2>
                         {/* Mobile Close Button */}
                         <button onClick={() => setActiveMobileCard(null)} className="md:hidden p-1 bg-white/10 rounded-full hover:bg-white/20">
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
 
-                    <div className="space-y-4 text-xs md:text-sm">
-                        <div className="flex justify-between items-center">
-                            <span className="text-gray-300 font-medium">Lokasi</span>
-                            <span className="font-semibold text-right">Cilandak, Jakarta Selatan</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-gray-300 font-medium">Tipe Kos</span>
-                            <span className="font-semibold text-right">Putra</span>
+                    <div className="space-y-4 text-xs md:text-sm text-gray-200">
+                        <p className="leading-relaxed">Jl. Pal Batu 2 No.71, Menteng Dalam, Kec. Tebet</p>
+                        <p className="font-semibold text-white">Jakarta Selatan • Tebet</p>
+
+                        <div className="grid grid-cols-2 gap-y-3 gap-x-2 pt-2">
+                            <div className="flex items-center space-x-2">
+                                <GenderIntersex className="w-[18px] h-[18px] text-white" weight="duotone" />
+                                <span>Campur</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Train className="w-[18px] h-[18px] text-white" weight="duotone" />
+                                <span>6 min Krl Tebet</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <BagSimple className="w-[18px] h-[18px] text-white" weight="duotone" />
+                                <span>Profesional</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <ShoppingBag className="w-[18px] h-[18px] text-white" weight="duotone" />
+                                <span>Mall Kokas</span>
+                            </div>
                         </div>
                     </div>
 
                     <div className="h-px w-full bg-white/20 my-6"></div>
 
-                    <div className="flex justify-between items-baseline">
+                    <div className="flex justify-between items-center mb-6">
                         <span className="text-gray-300 text-xs md:text-sm font-medium">Harga / bulan</span>
-                        <span className="text-xl md:text-2xl font-bold tracking-tight">Rp 1.200.000</span>
+                        <span className="text-xl md:text-2xl font-bold tracking-tight text-white">Rp 1.850.000</span>
+                    </div>
+
+                    <div className="flex justify-between items-center mt-auto">
+                        <span className="text-gray-200 text-xs font-medium">Please check for availability</span>
+                        <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#25D366] flex items-center justify-center hover:bg-[#1DA851] transition-colors shadow-lg">
+                            <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} className="w-5 h-5 md:w-6 md:h-6" />
+                        </a>
                     </div>
                 </div>
 
@@ -115,39 +143,46 @@ export default function DetailKosNewCilandak() {
 
                     <div className="space-y-4">
                         <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <Bed className="w-4 h-4 text-black" weight="fill" />
-                            </div>
+                            <Bed className="w-5 h-5 text-white" weight="bold" />
                             <span className="font-bold text-sm">Kasur</span>
                         </div>
 
                         <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <Bed className="w-4 h-4 text-black" weight="fill" />
-                            </div>
-                            <span className="font-bold text-sm">Bantal</span>
-                        </div>
-
-                        <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <Bathtub className="w-4 h-4 text-black" weight="fill" />
-                            </div>
+                            <Bathtub className="w-5 h-5 text-white" weight="bold" />
                             <span className="font-bold text-sm">Kamar Mandi</span>
                         </div>
 
                         <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <Television className="w-4 h-4 text-black" weight="bold" />
-                            </div>
+                            <Television className="w-5 h-5 text-white" weight="bold" />
                             <span className="font-bold text-sm">TV</span>
                         </div>
 
                         <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 flex items-center justify-center bg-white rounded-full">
-                                <Wind className="w-4 h-4 text-black" weight="bold" />
-                            </div>
+                            <Wind className="w-5 h-5 text-white" weight="bold" />
                             <span className="font-bold text-sm">AC</span>
                         </div>
+                    </div>
+                </div>
+
+                {/* Map Location Card */}
+                <div className={`absolute top-[48%] lg:top-[320px] right-6 md:right-[50px] md:left-auto left-6 p-5 md:p-6 rounded-[24px] bg-black/40 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] lg:w-72 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] pointer-events-auto transition-opacity duration-300 flex flex-col ${activeMobileCard === 'map' ? 'opacity-100 z-40' : 'opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-10'}`}>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl md:text-xl font-bold tracking-tight">Lokasi</h2>
+                        {/* Mobile Close Button */}
+                        <button onClick={() => setActiveMobileCard(null)} className="md:hidden p-1 bg-white/10 rounded-full hover:bg-white/20 relative z-50 pointer-events-auto">
+                            <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+
+                    <div className="relative w-full aspect-video md:h-40 rounded-xl overflow-hidden bg-black/20 border border-white/10 shadow-inner">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2804.580796786769!2d106.84320896136252!3d-6.227269210331134!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f327e6902361%3A0x1a3fc960d862afcf!2sKost%20Palbatu%20271!5e0!3m2!1sid!2sid!4v1773650707284!5m2!1sid!2sid"
+                            className="absolute inset-0 w-full h-full"
+                            style={{ border: 0 }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
                     </div>
                 </div>
 
@@ -162,7 +197,7 @@ export default function DetailKosNewCilandak() {
                             <div className="relative w-[119px] h-[42px]">
                                 <Image src="/icon-markers-hover.svg" alt="Hover bg" fill className="object-contain" />
                                 <div className="absolute inset-0 flex items-start justify-center pt-[6px] pointer-events-none">
-                                    <span className="text-black font-medium text-[13px]">Balkon</span>
+                                    <span className="text-white font-medium text-[13px]">Balkon</span>
                                 </div>
                             </div>
                         </div>
@@ -181,7 +216,7 @@ export default function DetailKosNewCilandak() {
                             <div className="relative w-[119px] h-[42px]">
                                 <Image src="/icon-markers-hover.svg" alt="Hover bg" fill className="object-contain" />
                                 <div className="absolute inset-0 flex items-start justify-center pt-[6px] pointer-events-none">
-                                    <span className="text-black font-medium text-[13px]">Ruang Tamu</span>
+                                    <span className="text-white font-medium text-[13px]">Kamar Tidur</span>
                                 </div>
                             </div>
                         </div>
@@ -196,76 +231,58 @@ export default function DetailKosNewCilandak() {
                     <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 pointer-events-none">
                         {/* Modal Content - Glass Style */}
                         <div
-                            className="relative w-full max-w-3xl rounded-[24px] md:rounded-[32px] bg-black/40 backdrop-blur-2xl border border-white/20 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-full pointer-events-auto animate-in fade-in zoom-in-95 duration-300 ease-out"
+                            className="relative w-[340px] md:w-[400px] rounded-[24px] md:rounded-[32px] bg-black/40 backdrop-blur-2xl border border-white/20 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden flex flex-col pointer-events-auto animate-in fade-in zoom-in-95 duration-300 ease-out p-4 md:p-5"
                         >
                             {/* Close Button */}
                             <button
                                 onClick={() => setActiveModal(null)}
-                                className="absolute top-4 right-4 z-10 p-2 bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-md transition-all duration-300 hover:scale-110"
+                                className="absolute top-6 right-6 z-10 p-1.5 bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-md transition-all duration-300 hover:scale-110"
                             >
-                                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
 
-                            {/* Image Header */}
-                            <div className="relative w-full aspect-[21/9] md:h-[280px] shrink-0 bg-black/50">
+                            {/* Image Frame */}
+                            <div className="relative w-full aspect-[3/4] rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
                                 <Image
-                                    src="/ruangtamu-koscilanda.png"
-                                    alt="Ruang Tamu"
+                                    src="/kamar-tidur-kos-palbatu.png"
+                                    alt="Kamar Tidur"
                                     fill
                                     className="object-cover"
                                 />
                             </div>
 
                             {/* Content Body */}
-                            <div className="p-5 md:p-8 overflow-y-auto">
-                                <h2 className="text-2xl md:text-4xl font-medium tracking-tight mb-3">Ruang Tamu</h2>
-                                <p className="text-gray-200 text-xs md:text-sm leading-relaxed max-w-2xl mb-6">
-                                    A spacious and elegant living area designed for comfort and luxury. Features premium furniture, ambient lighting, and panoramic views of the garden.
+                            <div className="pt-4 pb-2 px-1">
+                                <h2 className="text-xl md:text-2xl font-bold tracking-tight mb-2">Kamar Tidur</h2>
+                                <p className="text-gray-200 text-xs md:text-[13px] leading-relaxed">
+                                    Jelajahi desain, fasilitas, dan detail rumah yang bisa menjadi hunian Anda.
                                 </p>
-
-                                <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#2AF56E] mb-3 md:mb-4">Facilities</h3>
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
-                                    {/* Smart TV 4K */}
-                                    <div className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                        <Television weight="bold" className="w-4 h-4 text-[#2AF56E]" />
-                                        <span className="text-[11px] md:text-xs font-semibold text-gray-200">Smart TV 4K</span>
-                                    </div>
-                                    {/* High-Speed WiFi */}
-                                    <div className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                        <WifiHigh weight="bold" className="w-4 h-4 text-[#2AF56E]" />
-                                        <span className="text-[11px] md:text-xs font-semibold text-gray-200">High-Speed WiFi</span>
-                                    </div>
-                                    {/* Climate Control */}
-                                    <div className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                        <Thermometer weight="bold" className="w-4 h-4 text-[#2AF56E]" />
-                                        <span className="text-[11px] md:text-xs font-semibold text-gray-200">Climate Control</span>
-                                    </div>
-                                    {/* Minibar */}
-                                    <div className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                        <Martini weight="bold" className="w-4 h-4 text-[#2AF56E]" />
-                                        <span className="text-[11px] md:text-xs font-semibold text-gray-200">Minibar</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {/* Mobile Bottom Navigation Pills */}
-                <div className="absolute bottom-6 left-0 right-0 flex md:hidden justify-center items-center gap-3 px-4 z-50 pointer-events-auto">
+                <div className="absolute bottom-6 left-0 right-0 flex md:hidden justify-center items-center gap-2 md:gap-3 px-4 z-50 pointer-events-auto">
                     <button
                         onClick={() => setActiveMobileCard(activeMobileCard === 'details' ? null : 'details')}
-                        className={`px-5 py-2.5 rounded-full backdrop-blur-md border border-white/20 text-white font-medium text-[13px] sm:text-sm transition-colors shadow-lg ${activeMobileCard === 'details' ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}
+                        className={`px-4 md:px-5 py-2 md:py-2.5 rounded-full backdrop-blur-md border border-white/20 text-white font-medium text-[12px] sm:text-sm transition-colors shadow-lg ${activeMobileCard === 'details' ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}
                     >
                         Kos Information
                     </button>
                     <button
                         onClick={() => setActiveMobileCard(activeMobileCard === 'facilities' ? null : 'facilities')}
-                        className={`px-6 py-2.5 rounded-full backdrop-blur-md border border-white/20 text-white font-medium text-[13px] sm:text-sm transition-colors shadow-lg ${activeMobileCard === 'facilities' ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}
+                        className={`px-4 md:px-5 py-2 md:py-2.5 rounded-full backdrop-blur-md border border-white/20 text-white font-medium text-[12px] sm:text-sm transition-colors shadow-lg ${activeMobileCard === 'facilities' ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}
                     >
                         Fasilitas
+                    </button>
+                    <button
+                        onClick={() => setActiveMobileCard(activeMobileCard === 'map' ? null : 'map')}
+                        className={`px-4 md:px-5 py-2 md:py-2.5 rounded-full backdrop-blur-md border border-white/20 text-white font-medium text-[12px] sm:text-sm transition-colors shadow-lg ${activeMobileCard === 'map' ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}
+                    >
+                        Lokasi Maps
                     </button>
                 </div>
 

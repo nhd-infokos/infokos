@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { Bed, Bathtub, Television, Wind, WifiHigh, Thermometer, Martini } from "@phosphor-icons/react";
+import { Bed, Bathtub, Television, Wind, WifiHigh, Thermometer, Martini, PersonSimpleWalk, Briefcase, MapPin, Buildings, GenderIntersex, Train, BagSimple, ShoppingBag } from "@phosphor-icons/react";
 
 // Dynamically import the Map component with strictly SSR disabled
 const Map = dynamic(() => import("@/components/Map"), {
@@ -13,31 +13,29 @@ const Map = dynamic(() => import("@/components/Map"), {
 });
 
 const KosTags = () => (
-  <div className="flex flex-wrap gap-1.5 mb-3">
-    <div className="flex items-center space-x-1.5 bg-[#F6F6F6] px-2.5 py-1 rounded-lg">
-      <svg className="w-4 h-4 text-[#555555]" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 7.3V13H8V9.6l1.8-.7" />
-      </svg>
-      <span className="text-[13px] font-medium text-[#555555]">7 menit ke halte bus</span>
+  <div className="flex flex-col mb-3">
+    <div className="grid grid-cols-2 gap-y-2.5 gap-x-2 mb-3 mt-1">
+      <div className="flex items-center space-x-1.5">
+        <GenderIntersex className="w-4 h-4 text-black" weight="duotone" />
+        <span className="text-[12px] sm:text-[13px] font-medium text-black">Campur</span>
+      </div>
+      <div className="flex items-center space-x-1.5">
+        <Train className="w-4 h-4 text-black" weight="duotone" />
+        <span className="text-[12px] sm:text-[13px] font-medium text-black">6 min Krl Tebet</span>
+      </div>
+      <div className="flex items-center space-x-1.5">
+        <BagSimple className="w-4 h-4 text-black" weight="duotone" />
+        <span className="text-[12px] sm:text-[13px] font-medium text-black">Profesional</span>
+      </div>
+      <div className="flex items-center space-x-1.5">
+        <ShoppingBag className="w-4 h-4 text-black" weight="duotone" />
+        <span className="text-[12px] sm:text-[13px] font-medium text-black">Mall Kokas</span>
+      </div>
     </div>
-    <div className="flex items-center space-x-1.5 bg-[#F6F6F6] px-2.5 py-1 rounded-lg">
-      <svg className="w-4 h-4 text-[#555555]" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" />
-      </svg>
-      <span className="text-[13px] font-medium text-[#555555]">untuk profesional</span>
-    </div>
-    <div className="flex items-center space-x-1.5 bg-[#F6F6F6] px-2.5 py-1 rounded-lg">
-      <svg className="w-4 h-4 text-[#555555]" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 10c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
-      </svg>
-      <span className="text-[13px] font-medium text-[#555555]">trisakti</span>
-    </div>
-    <div className="flex items-center space-x-1.5 bg-[#F6F6F6] px-2.5 py-1 rounded-lg">
-      <svg className="w-4 h-4 text-[#555555]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        <circle cx="12" cy="10" r="3" />
-      </svg>
-      <span className="text-[13px] font-medium text-[#555555]">untar</span>
+    
+    <div className="flex items-center space-x-2.5 py-1.5 px-3 rounded-xl bg-green-50 border border-green-200 self-start shadow-sm mt-1">
+      <Image src="/whatsapp.svg" alt="WhatsApp" width={16} height={16} className="w-4 h-4" />
+      <span className="text-[11.5px] font-bold text-green-700 tracking-tight">Please check for availability</span>
     </div>
   </div>
 );
@@ -50,7 +48,7 @@ export default function Home() {
       {/* Navigation Header */}
       <nav className="flex items-center justify-between px-[50px] py-6 w-full">
         {/* Logo */}
-        <div className="flex items-center">
+        <div className="flex items-center flex-1">
           <Link href="/" className="flex items-center gap-3">
             <Image
               src="/logo-carikos.svg"
@@ -67,7 +65,7 @@ export default function Home() {
         </div>
 
         {/* Links / Navigation */}
-        <div className="hidden sm:flex items-center space-x-2">
+        <div className="hidden sm:flex justify-center items-center space-x-2">
           <a href="#" className="px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors">
             Home
           </a>
@@ -77,6 +75,14 @@ export default function Home() {
           <a href="#" className="px-6 py-2.5 bg-white text-black border border-gray-300 text-sm font-medium rounded-full shadow-sm hover:bg-gray-50 transition-colors">
             Maps
           </a>
+        </div>
+
+        {/* Right Action Button */}
+        <div className="flex items-center justify-end flex-1 hidden sm:flex">
+          <button className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors">
+            <span>Daftarkan Kosmu Disini</span>
+            <Buildings className="w-5 h-5" weight="duotone" />
+          </button>
         </div>
       </nav>
 
@@ -358,7 +364,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-1">Kos Mayapada</h3>
               <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
+                <MapPin className="w-4 h-4" weight="fill" />
                 <span>Cilandak, Jakarta Selatan</span>
               </div>
               <KosTags />
@@ -375,7 +381,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-1">Kos Waduk</h3>
               <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
+                <MapPin className="w-4 h-4" weight="fill" />
                 <span>Cilandak, Jakarta Selatan</span>
               </div>
               <KosTags />
@@ -388,16 +394,16 @@ export default function Home() {
             {/* Card 3 */}
             <Link href="/detail/kos-new-cilandak" className="group cursor-pointer block">
               <div className="relative w-full aspect-square rounded-[24px] overflow-hidden mb-4 bg-gray-100">
-                <Image src="/kos-3.jpg" alt="Kos New Cilandak" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                <Image src="/kos-palbatu.png" alt="Kos New Cilandak" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
-              <h3 className="text-xl font-bold mb-1">Kos New Cilandak</h3>
+              <h3 className="text-xl font-bold mb-1">Kos Pal Batu 271</h3>
               <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
-                <span>Cilandak, Jakarta Selatan</span>
+                <MapPin className="w-4 h-4" weight="fill" />
+                <span>Tebet, Jakarta Selatan</span>
               </div>
               <KosTags />
               <div className="text-lg">
-                <span className="font-bold text-[#E53E3E]">Rp 1.500.000</span>
+                <span className="font-bold text-[#E53E3E]">Rp 1.850.000</span>
                 <span className="font-medium">/bulan</span>
               </div>
             </Link>
@@ -409,7 +415,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-1">Kos Green Mayapada</h3>
               <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
+                <MapPin className="w-4 h-4" weight="fill" />
                 <span>Cilandak, Jakarta Selatan</span>
               </div>
               <KosTags />
