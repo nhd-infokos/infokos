@@ -8,7 +8,8 @@ import {
   Buildings, GenderIntersex, Train, BagSimple, ShoppingBag
 } from "@phosphor-icons/react";
 import type { Kos, KosRoom } from "@/types/kos";
-import { iconMap, formatPrice } from "@/lib/utils";
+import { iconMap } from "@/lib/icon-map";
+import { formatPrice } from "@/lib/utils";
 
 export default function DetailKos() {
   const params = useParams();
