@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
-  MapPin, Buildings, GenderIntersex, Train, BagSimple, ShoppingBag
+  MapPin, Buildings, GenderIntersex, Train, BagSimple, ShoppingBag, Money
 } from "@phosphor-icons/react";
 import type { Kos, KosRoom } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
@@ -61,6 +62,18 @@ export default function Home() {
   const [kosList, setKosList] = useState<Kos[]>([]);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const { scrollY } = useScroll();
+
+  // Use absolute scroll position to avoid hydration ref errors when loading
+  // 4-point mapping:
+  // 50-350: Expand to full screen
+  // 350-600: Stay full screen
+  // 600-900: Shrink back to rounded bounds
+  const widthPadding = useTransform(scrollY, [50, 350, 600, 900], [0, 100, 100, 0]);
+  const containerWidth = useTransform(widthPadding, (w) => `calc(100% + ${w}px)`);
+  const marginStr = useTransform(widthPadding, (w) => `-${w / 2}px`);
+  const borderRadius = useTransform(scrollY, [50, 350, 600, 900], ["32px", "0px", "0px", "32px"]);
 
   useEffect(() => {
     async function fetchData() {
@@ -135,7 +148,15 @@ export default function Home() {
 
         {/* Hero Image & Cards */}
         {featuredKos && (
-          <div className="relative w-full rounded-[32px] overflow-hidden aspect-[4/3] md:aspect-[16/10] bg-gray-100 shadow-2xl">
+          <motion.div
+            className="relative overflow-hidden aspect-[4/3] md:aspect-[16/10] bg-gray-100 shadow-2xl"
+            style={{
+              width: containerWidth,
+              marginLeft: marginStr,
+              marginRight: marginStr,
+              borderRadius
+            }}
+          >
             <Image src={featuredKos.image_url || ""} alt={featuredKos.name} fill className="object-cover" priority />
 
             {/* Room Markers */}
@@ -165,7 +186,7 @@ export default function Home() {
             ))}
 
             {/* Left Glass Card - Kos Details */}
-            <div className="absolute top-6 left-6 md:top-12 md:left-12 p-6 md:p-8 rounded-[24px] bg-black/20 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] md:w-80 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+            <div className="absolute top-10 left-6 md:top-36 md:left-12 p-6 md:p-8 rounded-[24px] bg-black/20 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] md:w-80 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
               <h2 className="text-xl md:text-2xl font-semibold mb-6 tracking-tight">{featuredKos.name}</h2>
               <div className="space-y-4 text-xs md:text-sm">
                 <div className="flex justify-between items-center">
@@ -186,7 +207,7 @@ export default function Home() {
 
             {/* Right Glass Card - Facilities */}
             {featuredKos.kos_facilities && featuredKos.kos_facilities.length > 0 && (
-              <div className="absolute top-6 right-6 md:top-12 md:right-12 p-6 md:p-8 rounded-[24px] bg-black/20 backdrop-blur-2xl border border-white/20 hidden lg:block w-72 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <div className="absolute top-10 right-6 md:top-36 md:right-12 p-6 md:p-8 rounded-[24px] bg-black/20 backdrop-blur-2xl border border-white/20 hidden lg:block w-72 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
                 <h2 className="text-xl md:text-2xl font-bold mb-6 tracking-tight">Fasilitas Kos</h2>
                 <div className="space-y-4">
                   {featuredKos.kos_facilities.map((facility) => {
@@ -246,7 +267,7 @@ export default function Home() {
                 </div>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Popular Kos Section */}
@@ -258,9 +279,10 @@ export default function Home() {
             </h2>
 
             {/* Pill Search Form */}
-            <div className="flex flex-col md:flex-row items-center bg-white md:border border-gray-800 md:rounded-full md:p-1.5 justify-center mt-4 w-full md:w-auto gap-3 md:gap-0">
-              <div className="relative w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-4 py-3 md:py-0 md:pl-6 md:pr-4">
-                <select className="appearance-none w-full bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
+            <div className="flex flex-col md:flex-row items-center bg-white md:border border-gray-800 md:rounded-full md:p-2 justify-center mt-4 w-full md:w-auto gap-3 md:gap-0">
+              <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
+                <MapPin className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
+                <select className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
                   <option>Lokasi</option>
                   <option>Jakarta Selatan</option>
                   <option>Jakarta Pusat</option>
@@ -272,9 +294,10 @@ export default function Home() {
                   <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                 </div>
               </div>
-              <div className="hidden md:block h-6 w-px bg-gray-300 mx-2"></div>
-              <div className="relative w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-4 py-3 md:py-0 md:px-4">
-                <select className="appearance-none w-full bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
+              <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
+              <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
+                <GenderIntersex className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
+                <select className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
                   <option>Tipe Kos</option>
                   <option>Putra</option>
                   <option>Putri</option>
@@ -284,9 +307,10 @@ export default function Home() {
                   <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                 </div>
               </div>
-              <div className="hidden md:block h-6 w-px bg-gray-300 mx-2"></div>
-              <div className="relative w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-4 py-3 md:py-0 md:px-4">
-                <select className="appearance-none w-full bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
+              <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
+              <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
+                <Money className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
+                <select className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
                   <option>Harga</option>
                   <option>&lt; 1 Juta</option>
                   <option>1 - 2 Juta</option>
@@ -296,7 +320,6 @@ export default function Home() {
                   <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                 </div>
               </div>
-              <button className="w-full md:w-auto bg-black text-white px-8 py-3 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors md:ml-4">Cari Kos</button>
             </div>
           </div>
 
