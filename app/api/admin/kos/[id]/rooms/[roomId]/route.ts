@@ -9,11 +9,35 @@ export async function PUT(
   try {
     const { roomId } = await params
     const body = await request.json()
-    const data = await updateRoom(roomId, body)
+    
+    // Safety check logging
+    console.log('Room ID:', roomId)
+    console.log('Body:', body)
+
+    // Whitelist only the fields that are meant to be updated
+    const updateData = {
+      name: body.name,
+      description: body.description,
+      image_url: body.image_url,
+      video_url: body.video_url,
+      marker_top: body.marker_top,
+      marker_left: body.marker_left,
+      sort_order: body.sort_order
+    }
+    
+    // Remove undefined values so we don't accidentally overwrite existing data with nulls
+    const cleanUpdateData = Object.fromEntries(
+      Object.entries(updateData).filter(([_, v]) => v !== undefined)
+    )
+    
+    const data = await updateRoom(roomId, cleanUpdateData)
     return NextResponse.json({ data })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating room:', error)
-    return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Failed to update', 
+      details: error?.message || 'Unknown error occurred'
+    }, { status: 500 })
   }
 }
 

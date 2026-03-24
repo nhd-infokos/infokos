@@ -1,11 +1,11 @@
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseAdmin } from '@/lib/supabase-admin'
 import type { KosFacility } from '@/types/kos'
 
 /**
  * Add facility to a kos.
  */
 export async function addFacility(kosId: string, data: { name: string; icon?: string; sort_order?: number }) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { data: facility, error } = await supabase
     .from('kos_facilities')
     .insert({ kos_id: kosId, ...data })
@@ -20,7 +20,7 @@ export async function addFacility(kosId: string, data: { name: string; icon?: st
  * Delete a facility by ID.
  */
 export async function deleteFacility(id: string) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { error } = await supabase
     .from('kos_facilities')
     .delete()

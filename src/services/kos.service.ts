@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseAdmin } from '@/lib/supabase-admin'
 
 // ---- Types ----
 
@@ -27,6 +28,15 @@ export interface Kos {
   updated_at: string
   kos_facilities?: KosFacility[]
   kos_images?: KosImage[]
+  kos_tags?: KosTag[]
+}
+
+export interface KosTag {
+  id: string
+  kos_id: string
+  name: string
+  icon: string
+  sort_order: number
 }
 
 export interface KosFacility {
@@ -65,7 +75,7 @@ export async function getKosList(filters?: KosFilters) {
   const supabase = await createSupabaseServerClient()
   let query = supabase
     .from('kos')
-    .select('*, kos_facilities(*)')
+    .select('*, kos_facilities(*), kos_tags(*)')
     .eq('is_published', true)
     .order('created_at', { ascending: false })
 
@@ -95,7 +105,7 @@ export async function getKosBySlug(slug: string) {
   const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase
     .from('kos')
-    .select('*, kos_facilities(*), kos_images(*)')
+    .select('*, kos_facilities(*), kos_images(*), kos_tags(*)')
     .eq('slug', slug)
     .eq('is_published', true)
     .single()
@@ -111,7 +121,7 @@ export async function getFeaturedKos() {
   const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase
     .from('kos')
-    .select('*, kos_facilities(*)')
+    .select('*, kos_facilities(*), kos_tags(*)')
     .eq('is_featured', true)
     .eq('is_published', true)
     .limit(1)
@@ -147,7 +157,7 @@ export async function getAllKosAdmin() {
   const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase
     .from('kos')
-    .select('*, kos_facilities(*)')
+    .select('*, kos_facilities(*), kos_tags(*)')
     .order('created_at', { ascending: false })
 
   if (error) throw error
@@ -161,7 +171,7 @@ export async function getKosById(id: string) {
   const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase
     .from('kos')
-    .select('*, kos_facilities(*), kos_images(*)')
+    .select('*, kos_facilities(*), kos_images(*), kos_tags(*)')
     .eq('id', id)
     .single()
 
@@ -173,7 +183,7 @@ export async function getKosById(id: string) {
  * Create a new kos.
  */
 export async function createKos(kosData: Partial<Kos>) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { data, error } = await supabase
     .from('kos')
     .insert(kosData)
@@ -188,7 +198,7 @@ export async function createKos(kosData: Partial<Kos>) {
  * Update kos by ID.
  */
 export async function updateKos(id: string, kosData: Partial<Kos>) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { data, error } = await supabase
     .from('kos')
     .update({ ...kosData, updated_at: new Date().toISOString() })
@@ -201,10 +211,10 @@ export async function updateKos(id: string, kosData: Partial<Kos>) {
 }
 
 /**
- * Delete kos by ID. (CASCADE deletes facilities, rooms, images)
+ * Delete kos by ID.
  */
 export async function deleteKos(id: string) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { error } = await supabase
     .from('kos')
     .delete()
@@ -212,4 +222,3 @@ export async function deleteKos(id: string) {
 
   if (error) throw error
 }
-

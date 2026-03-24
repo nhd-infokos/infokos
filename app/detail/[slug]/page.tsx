@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
-  Buildings, GenderIntersex, Train, BagSimple, ShoppingBag
+  Buildings
 } from "@phosphor-icons/react";
 import type { Kos, KosRoom } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
@@ -90,10 +90,10 @@ export default function DetailKos() {
             <span className="text-[32px] font-bold tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>Kosku</span>
           </Link>
         </div>
-        <div className="hidden sm:flex justify-center items-center space-x-2">
-          <Link href="/" className="px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors">Home</Link>
-          <a href="#" className="px-6 py-2.5 bg-white/20 backdrop-blur-md text-black border border-white/30 text-sm font-medium rounded-full shadow-sm hover:bg-white/40 transition-colors">Cari Kos</a>
-          <a href="#" className="px-6 py-2.5 bg-white/20 backdrop-blur-md text-black border border-white/30 text-sm font-medium rounded-full shadow-sm hover:bg-white/40 transition-colors">Maps</a>
+        <div className="hidden sm:flex justify-center items-center space-x-8">
+          <Link href="/" className="text-[15px] font-bold text-black hover:text-gray-600 transition-colors">Home</Link>
+          <a href="#" className="text-[15px] font-semibold text-gray-700 hover:text-black transition-colors">Cari Kos</a>
+          <a href="#" className="text-[15px] font-semibold text-gray-700 hover:text-black transition-colors">Maps</a>
         </div>
         <div className="flex items-center justify-end flex-1 hidden sm:flex">
           <button className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors shadow-lg shadow-black/20">
@@ -117,30 +117,15 @@ export default function DetailKos() {
             {kos.address && <p className="leading-relaxed">{kos.address}</p>}
             <p className="font-semibold text-white">{kos.city} • {kos.district}</p>
             <div className="grid grid-cols-2 gap-y-3 gap-x-2 pt-2">
-              {kos.gender_label && (
-                <div className="flex items-center space-x-2">
-                  <GenderIntersex className="w-[18px] h-[18px] text-white" weight="duotone" />
-                  <span>{kos.gender_label}</span>
-                </div>
-              )}
-              {kos.nearby_transport && (
-                <div className="flex items-center space-x-2">
-                  <Train className="w-[18px] h-[18px] text-white" weight="duotone" />
-                  <span>{kos.nearby_transport}</span>
-                </div>
-              )}
-              {kos.target_tenant && (
-                <div className="flex items-center space-x-2">
-                  <BagSimple className="w-[18px] h-[18px] text-white" weight="duotone" />
-                  <span>{kos.target_tenant}</span>
-                </div>
-              )}
-              {kos.nearby_mall && (
-                <div className="flex items-center space-x-2">
-                  <ShoppingBag className="w-[18px] h-[18px] text-white" weight="duotone" />
-                  <span>{kos.nearby_mall}</span>
-                </div>
-              )}
+              {kos.kos_tags?.map((tag) => {
+                const TagIcon = iconMap[tag.icon];
+                return (
+                  <div key={tag.id} className="flex items-center space-x-2">
+                    {TagIcon && <TagIcon className="w-[18px] h-[18px] text-white" weight="duotone" />}
+                    <span>{tag.name}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className="h-px w-full bg-white/20 my-6"></div>

@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
-  MapPin, Buildings, GenderIntersex, Train, BagSimple, ShoppingBag, Money
+  MapPin, Buildings, GenderIntersex, Money
 } from "@phosphor-icons/react";
 import type { Kos, KosRoom } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
@@ -24,30 +24,15 @@ const Map = dynamic(() => import("@/components/Map"), {
 const KosTags = ({ kos }: { kos: Kos }) => (
   <div className="flex flex-col mb-3">
     <div className="grid grid-cols-2 gap-y-2.5 gap-x-2 mb-3 mt-1">
-      {kos.gender_label && (
-        <div className="flex items-center space-x-1.5">
-          <GenderIntersex className="w-4 h-4 text-black" weight="duotone" />
-          <span className="text-[12px] sm:text-[13px] font-medium text-black">{kos.gender_label}</span>
-        </div>
-      )}
-      {kos.nearby_transport && (
-        <div className="flex items-center space-x-1.5">
-          <Train className="w-4 h-4 text-black" weight="duotone" />
-          <span className="text-[12px] sm:text-[13px] font-medium text-black">{kos.nearby_transport}</span>
-        </div>
-      )}
-      {kos.target_tenant && (
-        <div className="flex items-center space-x-1.5">
-          <BagSimple className="w-4 h-4 text-black" weight="duotone" />
-          <span className="text-[12px] sm:text-[13px] font-medium text-black">{kos.target_tenant}</span>
-        </div>
-      )}
-      {kos.nearby_mall && (
-        <div className="flex items-center space-x-1.5">
-          <ShoppingBag className="w-4 h-4 text-black" weight="duotone" />
-          <span className="text-[12px] sm:text-[13px] font-medium text-black">{kos.nearby_mall}</span>
-        </div>
-      )}
+      {kos.kos_tags?.map((tag) => {
+        const TagIcon = iconMap[tag.icon];
+        return (
+          <div key={tag.id} className="flex items-center space-x-1.5">
+            {TagIcon && <TagIcon className="w-4 h-4 text-black" weight="duotone" />}
+            <span className="text-[12px] sm:text-[13px] font-medium text-black">{tag.name}</span>
+          </div>
+        );
+      })}
     </div>
     <div className="flex items-center space-x-2.5 py-1.5 px-3 rounded-xl bg-green-50 border border-green-200 self-start shadow-sm mt-1">
       <Image src="/whatsapp.svg" alt="WhatsApp" width={16} height={16} className="w-4 h-4" />
@@ -62,6 +47,11 @@ export default function Home() {
   const [kosList, setKosList] = useState<Kos[]>([]);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Filter States
+  const [filterLokasi, setFilterLokasi] = useState("Lokasi");
+  const [filterTipe, setFilterTipe] = useState("Tipe Kos");
+  const [filterHarga, setFilterHarga] = useState("Harga");
 
   const { scrollY } = useScroll();
 
@@ -114,8 +104,22 @@ export default function Home() {
     );
   }
 
+  const filteredKosList = kosList.filter((kos) => {
+    if (filterLokasi !== "Lokasi" && kos.city !== filterLokasi && kos.district !== filterLokasi) return false;
+    if (filterTipe !== "Tipe Kos" && kos.gender_label !== filterTipe && kos.kos_type !== filterTipe) return false;
+
+    if (filterHarga !== "Harga") {
+      const price = kos.price || 0;
+      if (filterHarga === "< 1 Juta" && price >= 1000000) return false;
+      if (filterHarga === "1 - 2 Juta" && (price < 1000000 || price > 2000000)) return false;
+      if (filterHarga === "> 2 Juta" && price <= 2000000) return false;
+    }
+
+    return true;
+  });
+
   return (
-    <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white pt-6 overflow-x-clip">
       {/* Navigation Header */}
       <nav className="flex items-center justify-between px-[50px] py-6 w-full">
         <div className="flex items-center flex-1">
@@ -124,10 +128,10 @@ export default function Home() {
             <span className="text-[32px] font-bold tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>Kosku</span>
           </Link>
         </div>
-        <div className="hidden sm:flex justify-center items-center space-x-2">
-          <a href="#" className="px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors">Home</a>
-          <a href="#" className="px-6 py-2.5 bg-white text-black border border-gray-300 text-sm font-medium rounded-full shadow-sm hover:bg-gray-50 transition-colors">Cari Kos</a>
-          <a href="#" className="px-6 py-2.5 bg-white text-black border border-gray-300 text-sm font-medium rounded-full shadow-sm hover:bg-gray-50 transition-colors">Maps</a>
+        <div className="hidden sm:flex justify-center items-center space-x-8">
+          <a href="#" className="text-[15px] font-bold text-black hover:text-gray-600 transition-colors">Home</a>
+          <a href="#" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Maps</a>
+          <a href="#" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Why Kosku</a>
         </div>
         <div className="flex items-center justify-end flex-1 hidden sm:flex">
           <button className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors">
@@ -187,21 +191,32 @@ export default function Home() {
 
             {/* Left Glass Card - Kos Details */}
             <div className="absolute top-10 left-6 md:top-36 md:left-12 p-6 md:p-8 rounded-[24px] bg-black/20 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] md:w-80 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
-              <h2 className="text-xl md:text-2xl font-semibold mb-6 tracking-tight">{featuredKos.name}</h2>
-              <div className="space-y-4 text-xs md:text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Lokasi</span>
-                  <span className="font-semibold text-right">{featuredKos.district}, {featuredKos.city}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Tipe Kos</span>
-                  <span className="font-semibold text-right">{featuredKos.gender_label || featuredKos.kos_type}</span>
+              <h2 className="text-xl md:text-2xl font-bold mb-6 tracking-tight">{featuredKos.name}</h2>
+              <div className="space-y-4 text-xs md:text-sm text-gray-200">
+                {featuredKos.address && <p className="leading-relaxed">{featuredKos.address}</p>}
+                <p className="font-semibold text-white">{featuredKos.city} • {featuredKos.district}</p>
+                <div className="grid grid-cols-2 gap-y-3 gap-x-2 pt-2">
+                  {featuredKos.kos_tags?.map((tag) => {
+                    const TagIcon = iconMap[tag.icon];
+                    return (
+                      <div key={tag.id} className="flex items-center space-x-2">
+                        {TagIcon && <TagIcon className="w-[18px] h-[18px] text-white" weight="duotone" />}
+                        <span>{tag.name}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
               <div className="h-px w-full bg-white/20 my-6"></div>
-              <div className="flex justify-between items-baseline">
+              <div className="flex justify-between items-center mb-6">
                 <span className="text-gray-300 text-xs md:text-sm font-medium">Harga / bulan</span>
-                <span className="text-xl md:text-2xl font-bold tracking-tight">{formatPrice(featuredKos.price)}</span>
+                <span className="text-xl md:text-2xl font-bold tracking-tight text-white">{formatPrice(featuredKos.price)}</span>
+              </div>
+              <div className="flex justify-between items-center mt-auto">
+                <span className="text-gray-200 text-xs font-medium">Please check for availability</span>
+                <a href={`https://wa.me/${featuredKos.whatsapp_number || "6281234567890"}`} target="_blank" rel="noreferrer" className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#25D366] flex items-center justify-center hover:bg-[#1DA851] transition-colors shadow-lg">
+                  <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} className="w-5 h-5 md:w-6 md:h-6" />
+                </a>
               </div>
             </div>
 
@@ -282,13 +297,17 @@ export default function Home() {
             <div className="flex flex-col md:flex-row items-center bg-white md:border border-gray-800 md:rounded-full md:p-2 justify-center mt-4 w-full md:w-auto gap-3 md:gap-0">
               <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
                 <MapPin className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-                <select className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
-                  <option>Lokasi</option>
-                  <option>Jakarta Selatan</option>
-                  <option>Jakarta Pusat</option>
-                  <option>Jakarta Barat</option>
-                  <option>Jakarta Timur</option>
-                  <option>Jakarta Utara</option>
+                <select
+                  className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
+                  value={filterLokasi}
+                  onChange={(e) => setFilterLokasi(e.target.value)}
+                >
+                  <option value="Lokasi">Lokasi</option>
+                  <option value="Jakarta Selatan">Jakarta Selatan</option>
+                  <option value="Jakarta Pusat">Jakarta Pusat</option>
+                  <option value="Jakarta Barat">Jakarta Barat</option>
+                  <option value="Jakarta Timur">Jakarta Timur</option>
+                  <option value="Jakarta Utara">Jakarta Utara</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
                   <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
@@ -297,11 +316,15 @@ export default function Home() {
               <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
               <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
                 <GenderIntersex className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-                <select className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
-                  <option>Tipe Kos</option>
-                  <option>Putra</option>
-                  <option>Putri</option>
-                  <option>Campuran</option>
+                <select
+                  className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
+                  value={filterTipe}
+                  onChange={(e) => setFilterTipe(e.target.value)}
+                >
+                  <option value="Tipe Kos">Tipe Kos</option>
+                  <option value="Putra">Putra</option>
+                  <option value="Putri">Putri</option>
+                  <option value="Campuran">Campuran</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
                   <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
@@ -310,11 +333,15 @@ export default function Home() {
               <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
               <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
                 <Money className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-                <select className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left">
-                  <option>Harga</option>
-                  <option>&lt; 1 Juta</option>
-                  <option>1 - 2 Juta</option>
-                  <option>&gt; 2 Juta</option>
+                <select
+                  className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
+                  value={filterHarga}
+                  onChange={(e) => setFilterHarga(e.target.value)}
+                >
+                  <option value="Harga">Harga</option>
+                  <option value="< 1 Juta">&lt; 1 Juta</option>
+                  <option value="1 - 2 Juta">1 - 2 Juta</option>
+                  <option value="> 2 Juta">&gt; 2 Juta</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
                   <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
@@ -323,25 +350,35 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {kosList.map((kos) => (
-              <Link key={kos.id} href={`/detail/${kos.slug}`} className="group cursor-pointer block">
-                <div className="relative w-full aspect-square rounded-[24px] overflow-hidden mb-4 bg-gray-100">
-                  <Image src={kos.image_url || ""} alt={kos.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                </div>
-                <h3 className="text-xl font-bold mb-1">{kos.name}</h3>
-                <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
-                  <MapPin className="w-4 h-4" weight="fill" />
-                  <span>{kos.district}, {kos.city}</span>
-                </div>
-                <KosTags kos={kos} />
-                <div className="text-lg">
-                  <span className="font-bold text-[#E53E3E]">{formatPrice(kos.price)}</span>
-                  <span className="font-medium">/bulan</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {filteredKosList.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredKosList.map((kos) => (
+                <Link key={kos.id} href={`/detail/${kos.slug}`} className="group cursor-pointer block">
+                  <div className="relative w-full aspect-square rounded-[24px] overflow-hidden mb-4 bg-gray-100">
+                    <Image src={kos.image_url || ""} alt={kos.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-1">{kos.name}</h3>
+                  <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
+                    <MapPin className="w-4 h-4" weight="fill" />
+                    <span>{kos.district}, {kos.city}</span>
+                  </div>
+                  <KosTags kos={kos} />
+                  <div className="text-lg">
+                    <span className="font-bold text-[#E53E3E]">{formatPrice(kos.price)}</span>
+                    <span className="font-medium">/bulan</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="w-full py-20 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
+                <MapPin size={32} weight="duotone" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Kos Tidak Ditemukan</h3>
+              <p className="text-gray-500 max-w-md">Kami tidak menemukan kos yang sesuai dengan filter Anda. Coba ubah opsi pencarian.</p>
+            </div>
+          )}
         </section>
 
         {/* Interactive Maps Section */}
@@ -379,8 +416,8 @@ export default function Home() {
                 <h3 className="text-black font-bold text-[15px] mb-6 tracking-wide">MENU</h3>
                 <ul className="space-y-4 text-sm md:text-[15px] text-[#888888] font-medium">
                   <li><a href="#" className="hover:text-black transition-colors">Home</a></li>
-                  <li><a href="#" className="hover:text-black transition-colors">Cari Kos</a></li>
                   <li><a href="#" className="hover:text-black transition-colors">Maps</a></li>
+                  <li><a href="#" className="hover:text-black transition-colors">Why Kosku</a></li>
                 </ul>
               </div>
               <div>

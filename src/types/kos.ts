@@ -25,6 +25,15 @@ export interface Kos {
   updated_at: string
   kos_facilities?: KosFacility[]
   kos_images?: KosImage[]
+  kos_tags?: KosTag[]
+}
+
+export interface KosTag {
+  id: string
+  kos_id: string
+  name: string
+  icon: string
+  sort_order: number
 }
 
 export interface KosFacility {

@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseAdmin } from '@/lib/supabase-admin'
 
 // ---- Types ----
 
@@ -22,7 +23,7 @@ export interface KosRoomFacility {
   icon: string | null
 }
 
-// ---- Service Functions ----
+// ---- Service Functions (Read — uses anon key with RLS) ----
 
 /**
  * Get all rooms for a kos by kos ID, including room facilities.
@@ -58,10 +59,10 @@ export async function getRoomsByKosSlug(slug: string) {
   return getRoomsByKosId(kos.id)
 }
 
-// ---- Admin CRUD ----
+// ---- Admin CRUD (Write — uses service_role key, bypasses RLS) ----
 
 export async function createRoom(kosId: string, data: Partial<KosRoom>) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { data: room, error } = await supabase
     .from('kos_rooms')
     .insert({ kos_id: kosId, ...data })
@@ -73,7 +74,7 @@ export async function createRoom(kosId: string, data: Partial<KosRoom>) {
 }
 
 export async function updateRoom(id: string, data: Partial<KosRoom>) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { data: room, error } = await supabase
     .from('kos_rooms')
     .update(data)
@@ -86,13 +87,13 @@ export async function updateRoom(id: string, data: Partial<KosRoom>) {
 }
 
 export async function deleteRoom(id: string) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { error } = await supabase.from('kos_rooms').delete().eq('id', id)
   if (error) throw error
 }
 
 export async function addRoomFacility(roomId: string, data: { name: string; icon?: string }) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { data: facility, error } = await supabase
     .from('kos_room_facilities')
     .insert({ room_id: roomId, ...data })
@@ -104,7 +105,7 @@ export async function addRoomFacility(roomId: string, data: { name: string; icon
 }
 
 export async function deleteRoomFacility(id: string) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   const { error } = await supabase.from('kos_room_facilities').delete().eq('id', id)
   if (error) throw error
 }
