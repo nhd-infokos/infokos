@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,159 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { iconMap } from "@/lib/icon-map";
 import type { KosTag, KosFacility } from "@/types/kos";
+import Image from "next/image";
 
 function generateSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+interface ImageUploadFieldProps {
+  label: string;
+  description: string;
+  value: string;
+  onChange: (url: string) => void;
+  type: string;
+  kosId?: string;
+}
+
+function ImageUploadField({ label, description, value, onChange, type, kosId }: ImageUploadFieldProps) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadedSize, setUploadedSize] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = useCallback(async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('File harus berupa gambar');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran file maksimal 10MB');
+      return;
+    }
+
+    setUploading(true);
+    setUploadedSize(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+      formData.append('kosId', kosId || 'new');
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.details || 'Upload failed');
+      }
+
+      const data = await res.json();
+      onChange(data.url);
+      setUploadedSize(data.size);
+      toast.success(`Gambar berhasil diupload (WebP, ${formatBytes(data.size)})`);
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast.error(`Gagal upload: ${error.message}`);
+    } finally {
+      setUploading(false);
+    }
+  }, [type, kosId, onChange]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleUpload(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleUpload(file);
+  }, [handleUpload]);
+
+  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = () => setIsDragging(false);
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <Label className="text-zinc-300 text-sm font-semibold">{label}</Label>
+        <p className="text-zinc-500 text-xs mt-0.5">{description}</p>
+      </div>
+
+      {/* Preview */}
+      {value && (
+        <div className={`relative overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 ${
+          type === 'mobile' ? 'w-[160px] aspect-[9/16]' : 'w-full max-w-[280px] aspect-video'
+        }`}>
+          <Image src={value} alt={label} fill className="object-cover" unoptimized />
+        </div>
+      )}
+
+      {/* Drop zone */}
+      <div
+        onClick={() => !uploading && fileInputRef.current?.click()}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        className={`relative flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed cursor-pointer transition-all ${
+          isDragging
+            ? 'border-blue-500 bg-blue-500/10'
+            : uploading
+            ? 'border-zinc-600 bg-zinc-800/50 cursor-wait'
+            : 'border-zinc-700 bg-zinc-800/30 hover:border-zinc-500 hover:bg-zinc-800/60'
+        }`}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+        {uploading ? (
+          <>
+            <div className="w-8 h-8 border-2 border-zinc-500 border-t-white rounded-full animate-spin" />
+            <span className="text-zinc-400 text-sm">Mengupload & konversi ke WebP...</span>
+          </>
+        ) : (
+          <>
+            <svg className="w-8 h-8 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span className="text-zinc-400 text-sm">Klik atau seret gambar ke sini</span>
+            <span className="text-zinc-600 text-xs">PNG, JPG, WebP — maks 10MB — otomatis konversi ke WebP</span>
+          </>
+        )}
+      </div>
+
+      {/* Upload result info */}
+      {uploadedSize && (
+        <p className="text-green-400 text-xs">✓ Terkonversi ke WebP — {formatBytes(uploadedSize)}</p>
+      )}
+
+      {/* URL field (readonly after upload, editable for manual input) */}
+      <div className="space-y-1">
+        <Label className="text-zinc-500 text-xs">URL</Label>
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="bg-zinc-800 border-zinc-700 text-white text-xs h-8"
+          placeholder="URL otomatis terisi setelah upload, atau isi manual"
+        />
+      </div>
+    </div>
+  );
 }
 
 interface KosFormProps {
@@ -481,17 +631,26 @@ export default function KosForm({ kosId }: KosFormProps) {
       {/* Media */}
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader><CardTitle className="text-lg text-white">Media</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label className="text-zinc-300">Image URL</Label>
-            <Input value={form.image_url} onChange={(e) => handleChange("image_url", e.target.value)}
-              className="bg-zinc-800 border-zinc-700 text-white" placeholder="/kos-palbatu.png" />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-zinc-300">Image Mobile URL</Label>
-            <Input value={form.image_mobile_url} onChange={(e) => handleChange("image_mobile_url", e.target.value)}
-              className="bg-zinc-800 border-zinc-700 text-white" placeholder="/Pal Batu 271-mobile.png" />
-          </div>
+        <CardContent className="space-y-6">
+          {/* Desktop Image */}
+          <ImageUploadField
+            label="Gambar Desktop"
+            description="Gambar utama kos untuk tampilan desktop (landscape)"
+            value={form.image_url}
+            onChange={(url) => handleChange("image_url", url)}
+            type="desktop"
+            kosId={kosId}
+          />
+
+          {/* Mobile Image */}
+          <ImageUploadField
+            label="Gambar Mobile"
+            description="Gambar kos untuk tampilan mobile (portrait)"
+            value={form.image_mobile_url}
+            onChange={(url) => handleChange("image_mobile_url", url)}
+            type="mobile"
+            kosId={kosId}
+          />
         </CardContent>
       </Card>
 

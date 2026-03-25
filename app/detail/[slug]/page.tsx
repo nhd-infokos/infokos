@@ -91,9 +91,9 @@ export default function DetailKos() {
           </Link>
         </div>
         <div className="hidden sm:flex justify-center items-center space-x-8">
-          <Link href="/" className="text-[15px] font-bold text-black hover:text-gray-600 transition-colors">Home</Link>
-          <a href="#" className="text-[15px] font-semibold text-gray-700 hover:text-black transition-colors">Cari Kos</a>
-          <a href="#" className="text-[15px] font-semibold text-gray-700 hover:text-black transition-colors">Maps</a>
+          <Link href="/" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Home</Link>
+          <a href="#" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Cari Kos</a>
+          <Link href="/maps" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Maps</Link>
         </div>
         <div className="flex items-center justify-end flex-1 hidden sm:flex">
           <button className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors shadow-lg shadow-black/20">
@@ -179,11 +179,11 @@ export default function DetailKos() {
           </div>
         )}
 
-        {/* Room Markers */}
+        {/* Room Markers — Desktop */}
         {rooms.map((room, index) => (
           <div
             key={room.id}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 pointer-events-auto"
+            className="absolute transform -translate-x-1/2 -translate-y-1/2 hidden md:flex flex-col items-center z-20 pointer-events-auto"
             style={{
               top: room.marker_top || "50%",
               left: room.marker_left || "50%",
@@ -192,6 +192,32 @@ export default function DetailKos() {
             onClick={() => setActiveModal(room.id)}
           >
             <div className="w-8 h-8 md:w-12 md:h-12 relative flex items-center justify-center group cursor-pointer">
+              <Image src="/icon-markers.svg" alt="Marker" width={48} height={48} className="absolute inset-0 w-full h-full drop-shadow-lg transition-opacity duration-300 group-hover:opacity-0" />
+              <div className="absolute opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100 pointer-events-none flex items-center justify-center -translate-y-2 drop-shadow-xl">
+                <div className="relative w-[119px] h-[42px]">
+                  <Image src="/icon-markers-hover.svg" alt="Hover bg" fill className="object-contain" />
+                  <div className="absolute inset-0 flex items-start justify-center pt-[6px] pointer-events-none">
+                    <span className="text-white font-medium text-[13px]">{room.name}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Room Markers — Mobile */}
+        {rooms.map((room, index) => (
+          <div
+            key={`mobile-${room.id}`}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2 flex md:hidden flex-col items-center z-20 pointer-events-auto"
+            style={{
+              top: room.marker_mobile_top || room.marker_top || "50%",
+              left: room.marker_mobile_left || room.marker_left || "50%",
+              animation: `float ${[3, 4, 3.5, 3][index % 4]}s ease-in-out infinite ${index * 0.5}s`,
+            }}
+            onClick={() => setActiveModal(room.id)}
+          >
+            <div className="w-8 h-8 relative flex items-center justify-center group cursor-pointer">
               <Image src="/icon-markers.svg" alt="Marker" width={48} height={48} className="absolute inset-0 w-full h-full drop-shadow-lg transition-opacity duration-300 group-hover:opacity-0" />
               <div className="absolute opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100 pointer-events-none flex items-center justify-center -translate-y-2 drop-shadow-xl">
                 <div className="relative w-[119px] h-[42px]">

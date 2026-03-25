@@ -22,6 +22,8 @@ export async function PUT(
       video_url: body.video_url,
       marker_top: body.marker_top,
       marker_left: body.marker_left,
+      marker_mobile_top: body.marker_mobile_top,
+      marker_mobile_left: body.marker_mobile_left,
       sort_order: body.sort_order
     }
     

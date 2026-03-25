@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   MapPin, Buildings, GenderIntersex, Money
@@ -11,15 +10,6 @@ import {
 import type { Kos, KosRoom } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
 import { formatPrice } from "@/lib/utils";
-
-const Map = dynamic(() => import("@/components/Map"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[500px] md:h-[600px] rounded-[32px] bg-gray-100 flex items-center justify-center text-gray-400 font-medium">
-      Memuat Peta...
-    </div>
-  ),
-});
 
 const KosTags = ({ kos }: { kos: Kos }) => (
   <div className="flex flex-col mb-3">
@@ -129,8 +119,8 @@ export default function Home() {
           </Link>
         </div>
         <div className="hidden sm:flex justify-center items-center space-x-8">
-          <a href="#" className="text-[15px] font-bold text-black hover:text-gray-600 transition-colors">Home</a>
-          <a href="#" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Maps</a>
+          <Link href="/" className="text-[15px] font-bold text-black hover:text-gray-600 transition-colors">Home</Link>
+          <Link href="/maps" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Maps</Link>
           <a href="#" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Why Kosku</a>
         </div>
         <div className="flex items-center justify-end flex-1 hidden sm:flex">
@@ -381,19 +371,54 @@ export default function Home() {
           )}
         </section>
 
-        {/* Interactive Maps Section */}
-        <section className="w-full mt-24 mb-10">
-          <div className="flex justify-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-center">Cari Lewat Maps</h2>
-          </div>
-          <div className="relative w-full mx-auto flex flex-col items-center">
-            <div className="absolute -top-6 transform z-20 w-11/12 sm:w-[500px] h-14 bg-white rounded-full shadow-lg border border-gray-200 flex items-center px-2 pr-2">
-              <input type="text" placeholder="Cari Kos" className="flex-1 w-full bg-transparent outline-none pl-6 text-sm font-medium text-gray-800 placeholder-gray-400" />
-              <button className="h-10 px-8 bg-black text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors">Cari</button>
+        {/* Call to Action Section */}
+        <section className="w-full mt-24">
+          <div className="bg-[#F0F0F0] rounded-[32px] flex flex-col md:flex-row items-center justify-between relative min-h-[400px] overflow-hidden">
+            {/* Left Image */}
+            <div className="w-full md:w-[40%] h-[300px] md:h-[450px] relative hidden md:block">
+              <Image
+                src="/img-preview-daftarkos.png"
+                alt="Kos Preview"
+                fill
+                className="object-cover object-left md:object-contain"
+              />
             </div>
-            <Map />
+
+            {/* Mobile Image */}
+            <div className="w-full h-[250px] relative block md:hidden mb-6 bg-white/10 rounded-t-[32px] overflow-hidden">
+              <Image
+                src="/img-preview-daftarkos.png"
+                alt="Kos Preview"
+                fill
+                className="object-cover"
+              />
+            </div>
+
+            {/* Middle Title */}
+            <div className="w-full md:w-[30%] flex items-center justify-center px-4 mb-8 md:mb-0 z-10 w-full text-center md:text-left">
+              <h2 className="text-2xl md:text-[24px] font-bold leading-[1.3] text-black md:max-w-[250px] w-full ">
+                Mau Kosmu Cepat Terisi?
+              </h2>
+            </div>
+
+            {/* Right Card */}
+            <div className="w-full md:w-[30%] flex justify-center md:justify-end md:pr-10 z-10 pb-6 md:pb-0 px-6 md:pr-10 md:pl-0 w-full">
+              <div className="bg-white rounded-[24px] p-8 shadow-sm w-full max-w-[360px]">
+                <h3 className="text-[22px] font-bold text-[#111111] leading-[1.3] mb-4">
+                  Yuk, Listing-in Kosmu!
+                </h3>
+                <p className="text-[14px] text-[#888888] font-medium leading-relaxed mb-8">
+                  Biar gak kosong terus 😉 Daftar kosmu di sini, langsung dilirik banyak calon penghuni. Cepat, praktis, dan cuan makin lancar!
+                </p>
+                <button className="flex items-center justify-center gap-2 px-6 py-3 bg-black text-white text-[15px] font-semibold rounded-full hover:bg-gray-800 transition-colors w-full mt-2">
+                  <span>Daftarkan Kosmu Disini</span>
+                  <Buildings className="w-5 h-5" weight="duotone" />
+                </button>
+              </div>
+            </div>
           </div>
         </section>
+
       </main>
 
       {/* Footer */}
@@ -415,8 +440,8 @@ export default function Home() {
               <div>
                 <h3 className="text-black font-bold text-[15px] mb-6 tracking-wide">MENU</h3>
                 <ul className="space-y-4 text-sm md:text-[15px] text-[#888888] font-medium">
-                  <li><a href="#" className="hover:text-black transition-colors">Home</a></li>
-                  <li><a href="#" className="hover:text-black transition-colors">Maps</a></li>
+                  <li><Link href="/" className="hover:text-black transition-colors">Home</Link></li>
+                  <li><Link href="/maps" className="hover:text-black transition-colors">Maps</Link></li>
                   <li><a href="#" className="hover:text-black transition-colors">Why Kosku</a></li>
                 </ul>
               </div>

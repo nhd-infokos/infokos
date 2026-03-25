@@ -12,6 +12,8 @@ export interface KosRoom {
   video_url: string | null
   marker_top: string | null
   marker_left: string | null
+  marker_mobile_top: string | null
+  marker_mobile_left: string | null
   sort_order: number
   kos_room_facilities?: KosRoomFacility[]
 }

@@ -16,6 +16,11 @@ interface MapKos {
   price: number;
 }
 
+interface MapProps {
+  kosList?: MapKos[];
+  className?: string;
+}
+
 const createPriceIcon = (price: string) => {
   return L.divIcon({
     className: "bg-transparent border-none",
@@ -25,38 +30,42 @@ const createPriceIcon = (price: string) => {
   });
 };
 
-export default function Map() {
+export default function Map({ kosList: externalKosList, className }: MapProps) {
   const router = useRouter();
   const [mapId, setMapId] = useState("");
-  const [kosList, setKosList] = useState<MapKos[]>([]);
+  const [internalKosList, setInternalKosList] = useState<MapKos[]>([]);
 
   useEffect(() => {
     setMapId("map-" + Date.now());
 
-    async function fetchMapData() {
-      try {
-        const res = await fetch("/api/kos?map=true");
-        const json = await res.json();
-        setKosList(json.data || []);
-      } catch (err) {
-        console.error("Error fetching map data:", err);
+    // Only fetch internally if no external data provided
+    if (!externalKosList) {
+      async function fetchMapData() {
+        try {
+          const res = await fetch("/api/kos?map=true");
+          const json = await res.json();
+          setInternalKosList(json.data || []);
+        } catch (err) {
+          console.error("Error fetching map data:", err);
+        }
       }
+      fetchMapData();
     }
-    fetchMapData();
-  }, []);
+  }, [externalKosList]);
 
+  const kosList = externalKosList ?? internalKosList;
   const position: [number, number] = [-6.2615, 106.8106];
 
   if (!mapId) {
     return (
-      <div className="w-full h-[500px] md:h-[600px] rounded-[32px] bg-gray-100 flex items-center justify-center text-gray-400 font-medium">
+      <div className={className || "w-full h-[500px] md:h-[600px] rounded-[32px] bg-gray-100 flex items-center justify-center text-gray-400 font-medium"}>
         Memuat Peta...
       </div>
     );
   }
 
   return (
-    <div className="w-full h-[500px] md:h-[600px] rounded-[32px] overflow-hidden shadow-sm border border-gray-100 relative z-0">
+    <div className={className || "w-full h-[500px] md:h-[600px] rounded-[32px] overflow-hidden shadow-sm border border-gray-100 relative z-0"}>
       <MapContainer
         key={mapId}
         center={position}

@@ -47,6 +47,8 @@ CREATE TABLE IF NOT EXISTS kos_rooms (
   video_url TEXT,
   marker_top TEXT,
   marker_left TEXT,
+  marker_mobile_top TEXT,
+  marker_mobile_left TEXT,
   sort_order INTEGER DEFAULT 0
 );
 
