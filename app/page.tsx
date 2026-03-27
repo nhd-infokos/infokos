@@ -3,76 +3,49 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
 import {
   MapPin, Buildings, GenderIntersex, Money
 } from "@phosphor-icons/react";
-import type { Kos, KosRoom } from "@/types/kos";
+import type { Kos } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
 import { formatPrice } from "@/lib/utils";
 
 const KosTags = ({ kos }: { kos: Kos }) => (
-  <div className="flex flex-col mb-3">
-    <div className="grid grid-cols-2 gap-y-2.5 gap-x-2 mb-3 mt-1">
-      {kos.kos_tags?.map((tag) => {
-        const TagIcon = iconMap[tag.icon];
-        return (
-          <div key={tag.id} className="flex items-center space-x-1.5">
-            {TagIcon && <TagIcon className="w-4 h-4 text-black" weight="duotone" />}
-            <span className="text-[12px] sm:text-[13px] font-medium text-black">{tag.name}</span>
-          </div>
-        );
-      })}
-    </div>
-    <div className="flex items-center space-x-2.5 py-1.5 px-3 rounded-xl bg-green-50 border border-green-200 self-start shadow-sm mt-1">
-      <Image src="/whatsapp.svg" alt="WhatsApp" width={16} height={16} className="w-4 h-4" />
-      <span className="text-[11.5px] font-bold text-green-700 tracking-tight">Please check for availability</span>
-    </div>
+  <div className="flex flex-wrap items-center gap-y-2 gap-x-4">
+    {kos.kos_tags?.map((tag) => {
+      const TagIcon = iconMap[tag.icon];
+      return (
+        <div key={tag.id} className="flex items-center space-x-1.5">
+          {TagIcon && <TagIcon className="w-5 h-5 text-[#111111]" weight="regular" />}
+          <span className="text-[15px] text-[#111111]">{tag.name}</span>
+        </div>
+      );
+    })}
   </div>
 );
 
 export default function Home() {
-  const [featuredKos, setFeaturedKos] = useState<Kos | null>(null);
-  const [featuredRooms, setFeaturedRooms] = useState<KosRoom[]>([]);
   const [kosList, setKosList] = useState<Kos[]>([]);
-  const [activeModal, setActiveModal] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
-  // Filter States
-  const [filterLokasi, setFilterLokasi] = useState("Lokasi");
-  const [filterTipe, setFilterTipe] = useState("Tipe Kos");
-  const [filterHarga, setFilterHarga] = useState("Harga");
-
-  const { scrollY } = useScroll();
-
-  // Use absolute scroll position to avoid hydration ref errors when loading
-  // 4-point mapping:
-  // 50-350: Expand to full screen
-  // 350-600: Stay full screen
-  // 600-900: Shrink back to rounded bounds
-  const widthPadding = useTransform(scrollY, [50, 350, 600, 900], [0, 100, 100, 0]);
-  const containerWidth = useTransform(widthPadding, (w) => `calc(100% + ${w}px)`);
-  const marginStr = useTransform(widthPadding, (w) => `-${w / 2}px`);
-  const borderRadius = useTransform(scrollY, [50, 350, 600, 900], ["32px", "0px", "0px", "32px"]);
+  const scrollSlider = (direction: 'left' | 'right') => {
+    if (sliderRef.current) {
+      const scrollAmount = 344;
+      sliderRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [featuredRes, listRes] = await Promise.all([
-          fetch("/api/kos?featured=true"),
-          fetch("/api/kos"),
-        ]);
-        const featured = await featuredRes.json();
+        const listRes = await fetch("/api/kos");
         const list = await listRes.json();
-
-        if (featured.data) {
-          setFeaturedKos(featured.data);
-          const roomsRes = await fetch(`/api/kos/${featured.data.slug}/rooms`);
-          const rooms = await roomsRes.json();
-          setFeaturedRooms(rooms.data || []);
-        }
         if (list.data) {
-          setKosList(list.data.filter((k: Kos) => !k.is_featured));
+          setKosList(list.data);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -83,9 +56,6 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const activeRoom = featuredRooms.find((r) => r.id === activeModal);
-  const floatDurations = [3, 4, 3.5, 3];
-
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -94,34 +64,20 @@ export default function Home() {
     );
   }
 
-  const filteredKosList = kosList.filter((kos) => {
-    if (filterLokasi !== "Lokasi" && kos.city !== filterLokasi && kos.district !== filterLokasi) return false;
-    if (filterTipe !== "Tipe Kos" && kos.gender_label !== filterTipe && kos.kos_type !== filterTipe) return false;
-
-    if (filterHarga !== "Harga") {
-      const price = kos.price || 0;
-      if (filterHarga === "< 1 Juta" && price >= 1000000) return false;
-      if (filterHarga === "1 - 2 Juta" && (price < 1000000 || price > 2000000)) return false;
-      if (filterHarga === "> 2 Juta" && price <= 2000000) return false;
-    }
-
-    return true;
-  });
-
   return (
     <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white pt-6 overflow-x-clip">
       {/* Navigation Header */}
       <nav className="flex items-center justify-between px-[50px] py-6 w-full">
         <div className="flex items-center flex-1">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/logo-carikos.svg" alt="Carikos Logo" width={44} height={38} priority className="w-auto h-8 sm:h-10 cursor-pointer" />
-            <span className="text-[32px] font-bold tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>Kosku</span>
+            <Image src="/nhdlogo.svg" alt="NHD Logo" width={50} height={39} priority className="w-auto h-8 sm:h-10 cursor-pointer" />
+            <span className="text-[32px] font-bold tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>Coliving</span>
           </Link>
         </div>
         <div className="hidden sm:flex justify-center items-center space-x-8">
           <Link href="/" className="text-[15px] font-bold text-black hover:text-gray-600 transition-colors">Home</Link>
           <Link href="/maps" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Maps</Link>
-          <a href="#" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Why Kosku</a>
+          <a href="#" className="text-[15px] font-regular text-gray-500 hover:text-black transition-colors">Why Nahdia</a>
         </div>
         <div className="flex items-center justify-end flex-1 hidden sm:flex">
           <button className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors">
@@ -132,243 +88,215 @@ export default function Home() {
       </nav>
 
       <main className="flex flex-col items-center w-full px-[50px] pb-16">
-        {/* Hero Title */}
-        <div className="text-center w-full px-4 sm:px-0 mt-6 sm:mt-12 mb-10 sm:mb-16">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[45px] font-medium leading-[1.2] tracking-tight text-[#111111] max-w-[1000px] mx-auto">
-            Cari kos modern yang tenang, nyaman, dan siap<br className="hidden md:block" />
-            jadi tempat pulang terbaikmu setiap hari.
-          </h1>
+        {/* Hero Banner */}
+        <div className="relative w-full mb-12 lg:mb-20">
+          <div className="relative w-full aspect-[16/7] md:aspect-[16/6] min-h-[400px] md:min-h-[520px] rounded-[24px] md:rounded-[32px] overflow-hidden">
+            <Image src="/img-webp/bg-banner.webp" alt="Hero Banner" fill className="object-cover" priority />
+            <div className="absolute inset-0 bg-black/30" />
+
+            {/* Center Text */}
+            <div className="absolute inset-0 flex items-center justify-center px-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] font-bold leading-[1.25] tracking-tight text-white text-center max-w-[800px]" style={{ fontFamily: "var(--font-poppins)" }}>
+                Cari kos modern yang tenang, nyaman, dan siap jadi tempat pulang terbaikmu setiap hari.
+              </h1>
+            </div>
+
+            {/* Arrow Left */}
+            <button className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 hover:opacity-80 transition-opacity" aria-label="Previous">
+              <svg width="48" height="48" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#hero_arrow_left)">
+                  <rect x="64" y="60" width="44" height="44" rx="22" transform="rotate(-180 64 60)" fill="white" fillOpacity="0.9" shapeRendering="crispEdges" />
+                  <path d="M36.1309 37.3809L44.8809 28.6309C44.9622 28.5496 45.0588 28.4852 45.165 28.4412C45.2712 28.3972 45.385 28.3745 45.5 28.3745C45.615 28.3745 45.7288 28.3972 45.835 28.4412C45.9413 28.4852 46.0378 28.5496 46.1191 28.6309C46.2004 28.7122 46.2649 28.8087 46.3088 28.915C46.3528 29.0212 46.3755 29.135 46.3755 29.25C46.3755 29.365 46.3528 29.4788 46.3088 29.585C46.2649 29.6913 46.2004 29.7878 46.1191 29.8691L37.987 38L46.1191 46.1309C46.2833 46.2951 46.3755 46.5178 46.3755 46.75C46.3755 46.9822 46.2833 47.2049 46.1191 47.3691C45.9549 47.5332 45.7322 47.6255 45.5 47.6255C45.2678 47.6255 45.0451 47.5332 44.8809 47.3691L36.1309 38.6191C36.0496 38.5378 35.985 38.4413 35.941 38.3351C35.897 38.2289 35.8743 38.115 35.8743 38C35.8743 37.885 35.897 37.7712 35.941 37.6649C35.985 37.5587 36.0496 37.4622 36.1309 37.3809Z" fill="black" />
+                </g>
+                <defs>
+                  <filter id="hero_arrow_left" x="0" y="0" width="84" height="84" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feOffset dy="4" />
+                    <feGaussianBlur stdDeviation="10" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape" />
+                  </filter>
+                </defs>
+              </svg>
+            </button>
+
+            {/* Arrow Right */}
+            <button className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 hover:opacity-80 transition-opacity" aria-label="Next">
+              <svg width="48" height="48" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#hero_arrow_right)">
+                  <rect x="20" y="16" width="44" height="44" rx="22" fill="white" fillOpacity="0.9" shapeRendering="crispEdges" />
+                  <path d="M47.8691 38.6191L39.1191 47.3691C39.0378 47.4504 38.9413 47.5148 38.835 47.5588C38.7288 47.6028 38.615 47.6255 38.5 47.6255C38.385 47.6255 38.2712 47.6028 38.165 47.5588C38.0587 47.5148 37.9622 47.4504 37.8809 47.3691C37.7996 47.2878 37.7352 47.1913 37.6912 47.085C37.6472 46.9788 37.6245 46.865 37.6245 46.75C37.6245 46.635 37.6472 46.5212 37.6912 46.415C37.7352 46.3087 37.7996 46.2122 37.8809 46.1309L46.013 38L37.8809 29.8691C37.7167 29.7049 37.6245 29.4822 37.6245 29.25C37.6245 29.0178 37.7167 28.7951 37.8809 28.6309C38.0451 28.4668 38.2678 28.3745 38.5 28.3745C38.7322 28.3745 38.9549 28.4668 39.1191 28.6309L47.8691 37.3809C47.9504 37.4622 48.015 37.5587 48.059 37.6649C48.103 37.7711 48.1257 37.885 48.1257 38C48.1257 38.115 48.103 38.2288 48.059 38.3351C48.015 38.4413 47.9504 38.5378 47.8691 38.6191Z" fill="black" />
+                </g>
+                <defs>
+                  <filter id="hero_arrow_right" x="0" y="0" width="84" height="84" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feOffset dy="4" />
+                    <feGaussianBlur stdDeviation="10" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape" />
+                  </filter>
+                </defs>
+              </svg>
+            </button>
+          </div>
+
+          {/* Filter Form - overlapping bottom */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-full max-w-[880px] px-4 hidden md:block">
+            <div className="flex items-center bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-2 w-full">
+              <div className="relative flex items-center flex-1 px-4 py-3 md:px-8">
+                <MapPin className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
+                <select className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6">
+                  <option>Lokasi</option>
+                  <option>Jakarta Selatan</option>
+                  <option>Jakarta Pusat</option>
+                  <option>Jakarta Barat</option>
+                  <option>Jakarta Timur</option>
+                  <option>Jakarta Utara</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                </div>
+              </div>
+
+              <div className="h-8 w-px bg-gray-300 shrink-0" />
+
+              <div className="relative flex items-center flex-1 px-4 py-3 md:px-8">
+                <Money className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
+                <select className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6">
+                  <option>Harga</option>
+                  <option>&lt; 1 Juta</option>
+                  <option>1 - 2 Juta</option>
+                  <option>&gt; 2 Juta</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                </div>
+              </div>
+
+              <div className="h-8 w-px bg-gray-300 shrink-0" />
+
+              <div className="relative flex items-center flex-1 px-4 py-3 md:px-8">
+                <GenderIntersex className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
+                <select className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6">
+                  <option>Tipe Kos</option>
+                  <option>Putra</option>
+                  <option>Putri</option>
+                  <option>Campuran</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                </div>
+              </div>
+
+              <button className="ml-2 px-8 py-3.5 bg-black text-white text-[15px] font-semibold rounded-full hover:bg-gray-800 transition-colors whitespace-nowrap shrink-0">
+                Cari Kos
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Hero Image & Cards */}
-        {featuredKos && (
-          <motion.div
-            className="relative overflow-hidden aspect-[4/3] md:aspect-[16/10] bg-gray-100 shadow-2xl"
-            style={{
-              width: containerWidth,
-              marginLeft: marginStr,
-              marginRight: marginStr,
-              borderRadius
-            }}
-          >
-            <Image src={featuredKos.image_url || ""} alt={featuredKos.name} fill className="object-cover" priority />
-
-            {/* Room Markers */}
-            {featuredRooms.map((room, index) => (
-              <div
-                key={room.id}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 hidden md:flex flex-col items-center z-20"
-                style={{
-                  top: room.marker_top || "50%",
-                  left: room.marker_left || "50%",
-                  animation: `float ${floatDurations[index % 4]}s ease-in-out infinite ${index * 0.5}s`,
-                }}
-                onClick={() => setActiveModal(room.id)}
-              >
-                <div className="w-8 h-8 md:w-12 md:h-12 relative flex items-center justify-center group cursor-pointer">
-                  <Image src="/icon-markers.svg" alt="Marker" width={48} height={48} className="absolute inset-0 w-full h-full drop-shadow-lg transition-opacity duration-300 group-hover:opacity-0" />
-                  <div className="absolute opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100 pointer-events-none flex items-center justify-center -translate-y-2 drop-shadow-xl">
-                    <div className="relative w-[119px] h-[42px]">
-                      <Image src="/icon-markers-hover.svg" alt="Hover bg" fill className="object-contain" />
-                      <div className="absolute inset-0 flex items-start justify-center pt-[6px] pointer-events-none">
-                        <span className="text-white font-medium text-[13px]">{room.name}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* Left Glass Card - Kos Details */}
-            <div className="absolute top-10 left-6 md:top-36 md:left-12 p-6 md:p-8 rounded-[24px] bg-black/20 backdrop-blur-2xl border border-white/20 w-[calc(100%-48px)] md:w-80 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
-              <h2 className="text-xl md:text-2xl font-bold mb-6 tracking-tight">{featuredKos.name}</h2>
-              <div className="space-y-4 text-xs md:text-sm text-gray-200">
-                {featuredKos.address && <p className="leading-relaxed">{featuredKos.address}</p>}
-                <p className="font-semibold text-white">{featuredKos.city} • {featuredKos.district}</p>
-                <div className="grid grid-cols-2 gap-y-3 gap-x-2 pt-2">
-                  {featuredKos.kos_tags?.map((tag) => {
-                    const TagIcon = iconMap[tag.icon];
-                    return (
-                      <div key={tag.id} className="flex items-center space-x-2">
-                        {TagIcon && <TagIcon className="w-[18px] h-[18px] text-white" weight="duotone" />}
-                        <span>{tag.name}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="h-px w-full bg-white/20 my-6"></div>
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-gray-300 text-xs md:text-sm font-medium">Harga / bulan</span>
-                <span className="text-xl md:text-2xl font-bold tracking-tight text-white">{formatPrice(featuredKos.price)}</span>
-              </div>
-              <div className="flex justify-between items-center mt-auto">
-                <span className="text-gray-200 text-xs font-medium">Please check for availability</span>
-                <a href={`https://wa.me/${featuredKos.whatsapp_number || "6281234567890"}`} target="_blank" rel="noreferrer" className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#25D366] flex items-center justify-center hover:bg-[#1DA851] transition-colors shadow-lg">
-                  <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} className="w-5 h-5 md:w-6 md:h-6" />
-                </a>
+        {/* Popular Kos Section */}
+        <section className="w-full mt-24 mb-10 overflow-hidden">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start w-[calc(100%+50px)] -mr-[50px]">
+            {/* Left Text */}
+            <div className="w-full lg:w-[20%] shrink-0 pr-4 lg:pr-8">
+              <h2 className="text-3xl md:text-4xl lg:text-[42px] font-bold leading-[1.2] text-[#111111] mb-6 tracking-tight">
+                Kost &<br />
+                Coliving<br />
+                Picked For<br />
+                You
+              </h2>
+              <p className="text-[#888888] text-[14px] lg:text-[15px] leading-relaxed mb-10 max-w-[240px] md:max-w-[280px]">
+                pekerja produktif Jakarta menghabiskan energi ekstra bukan karena jobdesc-nya berat, tapi karena environment sehari-harinya nggak supportif — mulai dari tempat tinggal sampai fasilitas yang tanggung
+              </p>
+              <div className="flex items-center -ml-4 gap-2">
+                <button onClick={() => scrollSlider('left')} className="hover:opacity-80 transition-opacity outline-none" aria-label="Previous">
+                  <svg width="64" height="64" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g filter="url(#filter0_d_248_692)">
+                      <rect x="64" y="60" width="44" height="44" rx="22" transform="rotate(-180 64 60)" fill="white" shape-rendering="crispEdges" />
+                      <path d="M36.1309 37.3809L44.8809 28.6309C44.9622 28.5496 45.0588 28.4852 45.165 28.4412C45.2712 28.3972 45.385 28.3745 45.5 28.3745C45.615 28.3745 45.7288 28.3972 45.835 28.4412C45.9413 28.4852 46.0378 28.5496 46.1191 28.6309C46.2004 28.7122 46.2649 28.8087 46.3088 28.915C46.3528 29.0212 46.3755 29.135 46.3755 29.25C46.3755 29.365 46.3528 29.4788 46.3088 29.585C46.2649 29.6913 46.2004 29.7878 46.1191 29.8691L37.987 38L46.1191 46.1309C46.2833 46.2951 46.3755 46.5178 46.3755 46.75C46.3755 46.9822 46.2833 47.2049 46.1191 47.3691C45.9549 47.5332 45.7322 47.6255 45.5 47.6255C45.2678 47.6255 45.0451 47.5332 44.8809 47.3691L36.1309 38.6191C36.0496 38.5378 35.985 38.4413 35.941 38.3351C35.897 38.2289 35.8743 38.115 35.8743 38C35.8743 37.885 35.897 37.7712 35.941 37.6649C35.985 37.5587 36.0496 37.4622 36.1309 37.3809Z" fill="black" />
+                    </g>
+                    <defs>
+                      <filter id="filter0_d_248_692" x="0" y="0" width="84" height="84" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                        <feOffset dy="4" />
+                        <feGaussianBlur stdDeviation="10" />
+                        <feComposite in2="hardAlpha" operator="out" />
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_248_692" />
+                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_248_692" result="shape" />
+                      </filter>
+                    </defs>
+                  </svg>
+                </button>
+                <button onClick={() => scrollSlider('right')} className="hover:opacity-80 transition-opacity outline-none -ml-4" aria-label="Next">
+                  <svg width="64" height="64" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g filter="url(#filter0_d_248_696)">
+                      <rect x="20" y="16" width="44" height="44" rx="22" fill="white" shape-rendering="crispEdges" />
+                      <path d="M47.8691 38.6191L39.1191 47.3691C39.0378 47.4504 38.9413 47.5148 38.835 47.5588C38.7288 47.6028 38.615 47.6255 38.5 47.6255C38.385 47.6255 38.2712 47.6028 38.165 47.5588C38.0587 47.5148 37.9622 47.4504 37.8809 47.3691C37.7996 47.2878 37.7352 47.1913 37.6912 47.085C37.6472 46.9788 37.6245 46.865 37.6245 46.75C37.6245 46.635 37.6472 46.5212 37.6912 46.415C37.7352 46.3087 37.7996 46.2122 37.8809 46.1309L46.013 38L37.8809 29.8691C37.7167 29.7049 37.6245 29.4822 37.6245 29.25C37.6245 29.0178 37.7167 28.7951 37.8809 28.6309C38.0451 28.4668 38.2678 28.3745 38.5 28.3745C38.7322 28.3745 38.9549 28.4668 39.1191 28.6309L47.8691 37.3809C47.9504 37.4622 48.015 37.5587 48.059 37.6649C48.103 37.7711 48.1257 37.885 48.1257 38C48.1257 38.115 48.103 38.2288 48.059 38.3351C48.015 38.4413 47.9504 38.5378 47.8691 38.6191Z" fill="black" />
+                    </g>
+                    <defs>
+                      <filter id="filter0_d_248_696" x="0" y="0" width="84" height="84" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                        <feOffset dy="4" />
+                        <feGaussianBlur stdDeviation="10" />
+                        <feComposite in2="hardAlpha" operator="out" />
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_248_696" />
+                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_248_696" result="shape" />
+                      </filter>
+                    </defs>
+                  </svg>
+                </button>
               </div>
             </div>
 
-            {/* Right Glass Card - Facilities */}
-            {featuredKos.kos_facilities && featuredKos.kos_facilities.length > 0 && (
-              <div className="absolute top-10 right-6 md:top-36 md:right-12 p-6 md:p-8 rounded-[24px] bg-black/20 backdrop-blur-2xl border border-white/20 hidden lg:block w-72 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
-                <h2 className="text-xl md:text-2xl font-bold mb-6 tracking-tight">Fasilitas Kos</h2>
-                <div className="space-y-4">
-                  {featuredKos.kos_facilities.map((facility) => {
-                    const IconComponent = facility.icon ? iconMap[facility.icon] : null;
-                    return (
-                      <div key={facility.id} className="flex items-center space-x-3">
-                        {IconComponent && <IconComponent className="w-5 h-5 text-white" />}
-                        <span className="font-bold text-sm">{facility.name}</span>
+            {/* Right Cards Slider */}
+            <div className="w-full lg:w-[70%]">
+              <div
+                ref={sliderRef}
+                className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 pt-2 pr-[50px] [&::-webkit-scrollbar]:hidden"
+                style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+              >
+                {kosList.length > 0 ? (
+                  kosList.map((kos) => (
+                    <Link key={kos.id} href={`/detail/${kos.slug}`} className="group cursor-pointer block w-[320px] shrink-0 snap-start">
+                      <div className="relative w-[320px] h-[320px] rounded-[24px] overflow-hidden mb-5 bg-gray-100">
+                        <Image src={kos.image_url || ""} alt={kos.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Room Detail Modal */}
-            {activeRoom && (
-              <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 pointer-events-none">
-                <div className="relative w-full max-w-3xl rounded-[24px] md:rounded-[32px] bg-black/40 backdrop-blur-2xl border border-white/20 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-full pointer-events-auto animate-in fade-in zoom-in-95 duration-300 ease-out">
-                  <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 z-10 p-2 bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-md transition-all duration-300 hover:scale-110">
-                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-
-                  {/* Video or Image Header */}
-                  <div className="relative w-full aspect-[21/9] md:h-[280px] shrink-0 bg-black/50">
-                    {activeRoom.video_url ? (
-                      <video src={activeRoom.video_url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
-                    ) : activeRoom.image_url ? (
-                      <Image src={activeRoom.image_url} alt={activeRoom.name} fill className="object-cover" />
-                    ) : null}
-                  </div>
-
-                  <div className="p-5 md:p-8 overflow-y-auto">
-                    <h2 className="text-2xl md:text-4xl font-medium tracking-tight mb-3">{activeRoom.name}</h2>
-                    {activeRoom.description && (
-                      <p className="text-gray-200 text-xs md:text-sm leading-relaxed max-w-2xl mb-6">{activeRoom.description}</p>
-                    )}
-                    {activeRoom.kos_room_facilities && activeRoom.kos_room_facilities.length > 0 && (
-                      <>
-                        <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#2AF56E] mb-3 md:mb-4">Facilities</h3>
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
-                          {activeRoom.kos_room_facilities.map((rf) => {
-                            const RFIcon = rf.icon ? iconMap[rf.icon] : null;
-                            return (
-                              <div key={rf.id} className="flex items-center space-x-2.5 bg-black/30 hover:bg-black/50 transition-colors backdrop-blur-md rounded-[14px] p-2.5 md:p-3 border border-white/10">
-                                {RFIcon && <RFIcon weight="bold" className="w-4 h-4 text-[#2AF56E]" />}
-                                <span className="text-[11px] md:text-xs font-semibold text-gray-200">{rf.name}</span>
-                              </div>
-                            );
-                          })}
+                      <div className="px-[12px]">
+                        <h3 className="text-[24px] font-semibold mb-2 text-[#111111]">{kos.name}</h3>
+                        <div className="flex items-center text-[#888888] mb-4 text-[15px] space-x-2">
+                          <MapPin className="w-5 h-5 text-[#B0B0B0]" weight="fill" />
+                          <span>{kos.district}, {kos.city}</span>
                         </div>
-                      </>
-                    )}
+                        <KosTags kos={kos} />
+                        <div className="text-right mt-5">
+                          <span className="font-medium text-[#E53E3E] text-[20px]">{formatPrice(kos.price)}</span>
+                          <span className="font-medium text-[#111111] text-[20px]">/bulan</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="w-full py-20 flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
+                      <MapPin size={32} weight="duotone" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Kos Tidak Ditemukan</h3>
                   </div>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
-
-        {/* Popular Kos Section */}
-        <section className="w-full mt-24">
-          <div className="flex flex-col items-center mb-12 text-center">
-            <span className="text-sm font-medium uppercase mb-3 text-gray-800">JELAJAHI KOS POPULER</span>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium leading-[1.3] text-[#111111] mb-8">
-              Dari kos hemat hingga eksklusif — semua ada dalam satu tempat.
-            </h2>
-
-            {/* Pill Search Form */}
-            <div className="flex flex-col md:flex-row items-center bg-white md:border border-gray-800 md:rounded-full md:p-2 justify-center mt-4 w-full md:w-auto gap-3 md:gap-0">
-              <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
-                <MapPin className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-                <select
-                  className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
-                  value={filterLokasi}
-                  onChange={(e) => setFilterLokasi(e.target.value)}
-                >
-                  <option value="Lokasi">Lokasi</option>
-                  <option value="Jakarta Selatan">Jakarta Selatan</option>
-                  <option value="Jakarta Pusat">Jakarta Pusat</option>
-                  <option value="Jakarta Barat">Jakarta Barat</option>
-                  <option value="Jakarta Timur">Jakarta Timur</option>
-                  <option value="Jakarta Utara">Jakarta Utara</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                </div>
-              </div>
-              <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
-              <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
-                <GenderIntersex className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-                <select
-                  className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
-                  value={filterTipe}
-                  onChange={(e) => setFilterTipe(e.target.value)}
-                >
-                  <option value="Tipe Kos">Tipe Kos</option>
-                  <option value="Putra">Putra</option>
-                  <option value="Putri">Putri</option>
-                  <option value="Campuran">Campuran</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                </div>
-              </div>
-              <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
-              <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
-                <Money className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-                <select
-                  className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
-                  value={filterHarga}
-                  onChange={(e) => setFilterHarga(e.target.value)}
-                >
-                  <option value="Harga">Harga</option>
-                  <option value="< 1 Juta">&lt; 1 Juta</option>
-                  <option value="1 - 2 Juta">1 - 2 Juta</option>
-                  <option value="> 2 Juta">&gt; 2 Juta</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                </div>
+                )}
               </div>
             </div>
           </div>
-
-          {filteredKosList.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredKosList.map((kos) => (
-                <Link key={kos.id} href={`/detail/${kos.slug}`} className="group cursor-pointer block">
-                  <div className="relative w-full aspect-square rounded-[24px] overflow-hidden mb-4 bg-gray-100">
-                    <Image src={kos.image_url || ""} alt={kos.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-1">{kos.name}</h3>
-                  <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
-                    <MapPin className="w-4 h-4" weight="fill" />
-                    <span>{kos.district}, {kos.city}</span>
-                  </div>
-                  <KosTags kos={kos} />
-                  <div className="text-lg">
-                    <span className="font-bold text-[#E53E3E]">{formatPrice(kos.price)}</span>
-                    <span className="font-medium">/bulan</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="w-full py-20 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
-                <MapPin size={32} weight="duotone" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Kos Tidak Ditemukan</h3>
-              <p className="text-gray-500 max-w-md">Kami tidak menemukan kos yang sesuai dengan filter Anda. Coba ubah opsi pencarian.</p>
-            </div>
-          )}
         </section>
 
         {/* Call to Action Section */}
@@ -428,7 +356,7 @@ export default function Home() {
             <div className="max-w-sm">
               <div className="mb-6">
                 <Link href="/" className="flex items-center gap-3 w-fit">
-                  <Image src="/logo-carikos.svg" alt="Carikos Logo" width={44} height={38} className="h-8 md:h-10 w-auto cursor-pointer" />
+                  <Image src="/nhdlogo.svg" alt="NHD Logo" width={50} height={39} className="h-8 md:h-10 w-auto cursor-pointer" />
                   <span className="text-[32px] font-bold tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>Kosku</span>
                 </Link>
               </div>
@@ -442,7 +370,7 @@ export default function Home() {
                 <ul className="space-y-4 text-sm md:text-[15px] text-[#888888] font-medium">
                   <li><Link href="/" className="hover:text-black transition-colors">Home</Link></li>
                   <li><Link href="/maps" className="hover:text-black transition-colors">Maps</Link></li>
-                  <li><a href="#" className="hover:text-black transition-colors">Why Kosku</a></li>
+                  <li><a href="#" className="hover:text-black transition-colors">Why Nahdia</a></li>
                 </ul>
               </div>
               <div>
