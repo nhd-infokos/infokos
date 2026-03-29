@@ -1,22 +1,51 @@
-import * as PhosphorIcons from "@phosphor-icons/react"
-import type { ComponentType } from "react"
+import {
+  MapPin, Buildings, GenderIntersex, Money,
+  WifiHigh, Bed, Shower, Toilet, Television,
+  Car, Motorcycle, Key, Wind, Drop, Lightning, Broom,
+  Desk, Chair, WashingMachine, FirstAid,
+  Fan, Thermometer, ForkKnife, Lamp, Plant, Cat, Dog, Tree,
+  Couch, Stairs, SecurityCamera, CoatHanger, Door, GenderFemale, Train, TrainSimple, ShieldCheck
+} from "@phosphor-icons/react";
+import type { ComponentType } from "react";
 
-// Automatically map ALL Phosphor icon components.
-// Filters out non-icon utility exports (IconContext, SSR, etc.)
-// This file must only be imported from client components ("use client")
-// Browse all icons at: https://phosphoricons.com
-export const iconMap: Record<string, ComponentType<any>> = (() => {
-  const map: Record<string, ComponentType<any>> = {}
-  for (const [name, value] of Object.entries(PhosphorIcons)) {
-    // Only keep PascalCase exports that are actual React components (objects with $$typeof)
-    if (
-      /^[A-Z][a-z]/.test(name) &&
-      typeof value === "object" &&
-      value !== null &&
-      "$$typeof" in value
-    ) {
-      map[name] = value as unknown as ComponentType<any>
-    }
-  }
-  return map
-})()
+// Explicitly map Phosphor icons to minimize bundle size.
+// Only add icons here that are actually used in the database.
+export const iconMap: Record<string, ComponentType<any>> = {
+  MapPin,
+  Buildings,
+  GenderIntersex,
+  Money,
+  WifiHigh,
+  Bed,
+  Shower,
+  Toilet,
+  Television,
+  Car,
+  Motorcycle,
+  Key,
+  Wind,
+  Drop,
+  Lightning,
+  Broom,
+  Desk,
+  Chair,
+  WashingMachine,
+  SecurityCamera,
+  FirstAid,
+  Fan,
+  Thermometer,
+  ForkKnife,
+  Lamp,
+  Plant,
+  Cat,
+  Dog,
+  Tree,
+  Couch,
+  Stairs,
+  CoatHanger,
+  Door,
+  GenderFemale,
+  Train,
+  TrainSimple,
+  ShieldCheck
+};
