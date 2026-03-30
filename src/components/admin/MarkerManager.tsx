@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { KosRoom, Kos } from "@/types/kos";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Trash2, Edit2, MapPin, Monitor, Smartphone } from "lucide-react";
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+}
 
 type ViewMode = "desktop" | "mobile";
 
@@ -36,11 +42,16 @@ export default function MarkerManager({ kosId }: MarkerManagerProps) {
   const [isMappingMode, setIsMappingMode] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
+  // Image upload state
+  const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadedSize, setUploadedSize] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState<Partial<KosRoom>>({
     name: "",
     description: "",
     image_url: "",
-    video_url: "",
     marker_top: "50%",
     marker_left: "50%",
     marker_mobile_top: "50%",
@@ -79,7 +90,6 @@ export default function MarkerManager({ kosId }: MarkerManagerProps) {
         name: "",
         description: "",
         image_url: "",
-        video_url: "",
         marker_top: "50%",
         marker_left: "50%",
         marker_mobile_top: "50%",
@@ -87,9 +97,67 @@ export default function MarkerManager({ kosId }: MarkerManagerProps) {
         sort_order: rooms.length + 1
       });
     }
+    setUploadedSize(null);
     setIsDialogOpen(true);
     setIsMappingMode(false);
   };
+
+  // Image upload handler
+  const handleMarkerImageUpload = useCallback(async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('File harus berupa gambar');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran file maksimal 10MB');
+      return;
+    }
+
+    setUploading(true);
+    setUploadedSize(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'marker');
+      formData.append('kosId', kosId);
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.details || 'Upload failed');
+      }
+
+      const data = await res.json();
+      setForm(prev => ({ ...prev, image_url: data.url }));
+      setUploadedSize(data.size);
+      toast.success(`Gambar berhasil diupload (WebP, ${formatBytes(data.size)})`);
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast.error(`Gagal upload: ${error.message}`);
+    } finally {
+      setUploading(false);
+    }
+  }, [kosId]);
+
+  const handleMarkerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleMarkerImageUpload(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleMarkerDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleMarkerImageUpload(file);
+  }, [handleMarkerImageUpload]);
+
+  const handleMarkerDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); };
+  const handleMarkerDragLeave = () => setIsDragging(false);
 
   const handleSave = async () => {
     if (!form.name) return toast.error("Nama marker harus diisi");
@@ -361,15 +429,65 @@ export default function MarkerManager({ kosId }: MarkerManagerProps) {
               <Textarea id="desc" value={form.description || ""} onChange={(e) => setForm({...form, description: e.target.value})} className="bg-zinc-800 border-zinc-700 text-white" placeholder="Detail ruangan..." />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="img" className="text-zinc-300">URL Gambar (Opsional)</Label>
-                <Input id="img" value={form.image_url || ""} onChange={(e) => setForm({...form, image_url: e.target.value})} className="bg-zinc-800 border-zinc-700 text-white" placeholder="/images/balkon.jpg" />
+            {/* Image Upload */}
+            <div className="grid gap-2">
+              <Label className="text-zinc-300">Gambar Marker (Opsional)</Label>
+              
+              {/* Preview */}
+              {form.image_url && (
+                <div className="relative w-full max-w-[260px] aspect-video overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800">
+                  <Image src={form.image_url} alt="Marker preview" fill className="object-cover" unoptimized />
+                  <button
+                    type="button"
+                    onClick={() => setForm(prev => ({ ...prev, image_url: '' }))}
+                    className="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {/* Drop zone */}
+              <div
+                onClick={() => !uploading && fileInputRef.current?.click()}
+                onDrop={handleMarkerDrop}
+                onDragOver={handleMarkerDragOver}
+                onDragLeave={handleMarkerDragLeave}
+                className={`relative flex flex-col items-center justify-center gap-2 p-5 rounded-lg border-2 border-dashed cursor-pointer transition-all ${
+                  isDragging
+                    ? 'border-blue-500 bg-blue-500/10'
+                    : uploading
+                    ? 'border-zinc-600 bg-zinc-800/50 cursor-wait'
+                    : 'border-zinc-700 bg-zinc-800/30 hover:border-zinc-500 hover:bg-zinc-800/60'
+                }`}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleMarkerFileChange}
+                  className="hidden"
+                />
+                {uploading ? (
+                  <>
+                    <div className="w-7 h-7 border-2 border-zinc-500 border-t-white rounded-full animate-spin" />
+                    <span className="text-zinc-400 text-xs">Mengupload & konversi ke WebP...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-7 h-7 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-zinc-400 text-xs">Klik atau seret gambar ke sini</span>
+                    <span className="text-zinc-600 text-[11px]">PNG, JPG, WebP — maks 10MB — otomatis konversi ke WebP</span>
+                  </>
+                )}
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="vid" className="text-zinc-300">URL Video (Opsional)</Label>
-                <Input id="vid" value={form.video_url || ""} onChange={(e) => setForm({...form, video_url: e.target.value})} className="bg-zinc-800 border-zinc-700 text-white" placeholder="https://youtube.com/..." />
-              </div>
+
+              {/* Upload result info */}
+              {uploadedSize && (
+                <p className="text-green-400 text-xs">✓ Terkonversi ke WebP — {formatBytes(uploadedSize)}</p>
+              )}
             </div>
 
             {/* Desktop Coordinates */}

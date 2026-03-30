@@ -351,8 +351,14 @@ export default function KosForm({ kosId }: KosFormProps) {
       });
 
       if (!res.ok) throw new Error("Failed");
-      toast.success(isEdit ? "Kos berhasil diupdate" : "Kos berhasil dibuat");
-      router.push("/admin/kos");
+      const responseData = await res.json();
+      toast.success(isEdit ? "Kos berhasil diupdate" : "Kos berhasil dibuat! Silakan lengkapi tags, fasilitas, dan marker.");
+      if (!isEdit && responseData?.data?.id) {
+        // Redirect to edit page so user can add tags, facilities, markers
+        router.push(`/admin/kos/${responseData.data.id}/edit`);
+      } else {
+        router.push("/admin/kos");
+      }
       router.refresh();
     } catch {
       toast.error("Gagal menyimpan data kos");
@@ -467,13 +473,17 @@ export default function KosForm({ kosId }: KosFormProps) {
           </div>
 
           {/* Dynamic Tags Section */}
-          {isEdit && (
-            <>
-              <Separator className="bg-zinc-800 my-2" />
-              <div className="space-y-3">
-                <Label className="text-zinc-300 text-base font-semibold">Tags Dinamis</Label>
-                <p className="text-zinc-500 text-xs">Tambah tags dengan nama dan icon Phosphor. Contoh icon: GenderIntersex, Train, BagSimple, ShoppingBag, MapPin, Coffee, dll.</p>
+          <Separator className="bg-zinc-800 my-2" />
+          <div className="space-y-3">
+            <Label className="text-zinc-300 text-base font-semibold">Tags Dinamis</Label>
+            <p className="text-zinc-500 text-xs">Tambah tags dengan nama dan icon Phosphor. Contoh icon: GenderIntersex, Train, BagSimple, ShoppingBag, MapPin, Coffee, dll.</p>
 
+            {!isEdit ? (
+              <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4">
+                <p className="text-amber-400 text-sm">⚠️ Simpan kos terlebih dahulu. Setelah disimpan, Anda akan diarahkan ke halaman edit untuk menambahkan tags, fasilitas, dan marker.</p>
+              </div>
+            ) : (
+              <>
                 {/* Add tag form */}
                 <div className="flex gap-2 items-end">
                   <div className="flex-1 space-y-1">
@@ -543,90 +553,96 @@ export default function KosForm({ kosId }: KosFormProps) {
                 {tags.length === 0 && (
                   <p className="text-zinc-600 text-xs italic">Belum ada tags. Tambahkan tags untuk ditampilkan di halaman depan.</p>
                 )}
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </CardContent>
       </Card>
 
       {/* Fasilitas Kos */}
-      {isEdit && (
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader><CardTitle className="text-lg text-white">Fasilitas Kos</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-zinc-500 text-xs">Tambah fasilitas kos dengan nama dan icon Phosphor. Contoh icon: Bed, Bathtub, Television, Wind, WifiHigh, Thermometer, Shower, dll.</p>
+      <Card className="bg-zinc-900 border-zinc-800">
+        <CardHeader><CardTitle className="text-lg text-white">Fasilitas Kos</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-zinc-500 text-xs">Tambah fasilitas kos dengan nama dan icon Phosphor. Contoh icon: Bed, Bathtub, Television, Wind, WifiHigh, Thermometer, Shower, dll.</p>
 
-            {/* Add facility form */}
-            <div className="flex gap-2 items-end">
-              <div className="flex-1 space-y-1">
-                <Label className="text-zinc-400 text-xs">Nama Fasilitas</Label>
-                <Input
-                  value={facilityName}
-                  onChange={(e) => setFacilityName(e.target.value)}
-                  className="bg-zinc-800 border-zinc-700 text-white"
-                  placeholder="Contoh: Kasur"
-                />
-              </div>
-              <div className="flex-1 space-y-1">
-                <Label className="text-zinc-400 text-xs">Nama Icon Phosphor</Label>
-                <div className="relative">
-                  <Input
-                    value={facilityIcon}
-                    onChange={(e) => setFacilityIcon(e.target.value)}
-                    className="bg-zinc-800 border-zinc-700 text-white pr-10"
-                    placeholder="Contoh: Bed"
-                  />
-                  {PreviewFacilityIcon && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                      <PreviewFacilityIcon className="w-5 h-5 text-blue-400" weight="duotone" />
-                    </div>
-                  )}
-                </div>
-              </div>
-              <Button
-                type="button"
-                onClick={handleAddFacility}
-                disabled={addingFacility}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 shrink-0"
-              >
-                {addingFacility ? "..." : "Tambah"}
-              </Button>
+          {!isEdit ? (
+            <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4">
+              <p className="text-amber-400 text-sm">⚠️ Simpan kos terlebih dahulu. Setelah disimpan, Anda akan diarahkan ke halaman edit untuk menambahkan fasilitas.</p>
             </div>
-
-            {/* Facilities list */}
-            {facilities.length > 0 && (
-              <div className="space-y-2 mt-3">
-                {facilities.map((f) => {
-                  const FIcon = f.icon ? iconMap[f.icon] : null;
-                  return (
-                    <div
-                      key={f.id}
-                      className="flex items-center justify-between bg-zinc-800/80 border border-zinc-700 rounded-lg px-3 py-2"
-                    >
-                      <div className="flex items-center gap-3">
-                        {FIcon && <FIcon className="w-5 h-5 text-white" weight="bold" />}
-                        <span className="text-white text-sm font-medium">{f.name}</span>
-                        <span className="text-zinc-500 text-xs">({f.icon})</span>
+          ) : (
+            <>
+              {/* Add facility form */}
+              <div className="flex gap-2 items-end">
+                <div className="flex-1 space-y-1">
+                  <Label className="text-zinc-400 text-xs">Nama Fasilitas</Label>
+                  <Input
+                    value={facilityName}
+                    onChange={(e) => setFacilityName(e.target.value)}
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    placeholder="Contoh: Kasur"
+                  />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <Label className="text-zinc-400 text-xs">Nama Icon Phosphor</Label>
+                  <div className="relative">
+                    <Input
+                      value={facilityIcon}
+                      onChange={(e) => setFacilityIcon(e.target.value)}
+                      className="bg-zinc-800 border-zinc-700 text-white pr-10"
+                      placeholder="Contoh: Bed"
+                    />
+                    {PreviewFacilityIcon && (
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <PreviewFacilityIcon className="w-5 h-5 text-blue-400" weight="duotone" />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteFacility(f.id)}
-                        className="text-red-400 hover:text-red-300 text-xs font-medium hover:bg-red-400/10 px-2 py-1 rounded transition-colors"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  );
-                })}
+                    )}
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  onClick={handleAddFacility}
+                  disabled={addingFacility}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 shrink-0"
+                >
+                  {addingFacility ? "..." : "Tambah"}
+                </Button>
               </div>
-            )}
 
-            {facilities.length === 0 && (
-              <p className="text-zinc-600 text-xs italic">Belum ada fasilitas. Tambahkan fasilitas untuk ditampilkan di halaman detail kos.</p>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              {/* Facilities list */}
+              {facilities.length > 0 && (
+                <div className="space-y-2 mt-3">
+                  {facilities.map((f) => {
+                    const FIcon = f.icon ? iconMap[f.icon] : null;
+                    return (
+                      <div
+                        key={f.id}
+                        className="flex items-center justify-between bg-zinc-800/80 border border-zinc-700 rounded-lg px-3 py-2"
+                      >
+                        <div className="flex items-center gap-3">
+                          {FIcon && <FIcon className="w-5 h-5 text-white" weight="bold" />}
+                          <span className="text-white text-sm font-medium">{f.name}</span>
+                          <span className="text-zinc-500 text-xs">({f.icon})</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFacility(f.id)}
+                          className="text-red-400 hover:text-red-300 text-xs font-medium hover:bg-red-400/10 px-2 py-1 rounded transition-colors"
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {facilities.length === 0 && (
+                <p className="text-zinc-600 text-xs italic">Belum ada fasilitas. Tambahkan fasilitas untuk ditampilkan di halaman detail kos.</p>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Media */}
       <Card className="bg-zinc-900 border-zinc-800">
