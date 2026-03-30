@@ -9,7 +9,7 @@ export default function CreateKosPage() {
       <Tabs defaultValue="info" className="w-full">
         <TabsList className="bg-zinc-900 border border-zinc-800">
           <TabsTrigger value="info" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white">Informasi Kos</TabsTrigger>
-          <TabsTrigger value="marker" disabled className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white opacity-50 cursor-not-allowed">Marker (Kamar)</TabsTrigger>
+          <TabsTrigger value="marker" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white opacity-50 cursor-not-allowed">Marker (Kamar)</TabsTrigger>
         </TabsList>
         <TabsContent value="info" className="mt-6">
           <KosForm />
