@@ -19,29 +19,30 @@ const Map = dynamic(() => import("@/components/Map"), {
 });
 
 const KosTags = ({ kos }: { kos: Kos }) => (
-  <div className="flex flex-col mb-3">
-    <div className="grid grid-cols-2 gap-y-2.5 gap-x-2 mb-3 mt-1">
-      {kos.kos_tags?.map((tag) => {
-        const TagIcon = iconMap[tag.icon];
-        return (
-          <div key={tag.id} className="flex items-center space-x-1.5">
-            {TagIcon && <TagIcon className="w-4 h-4 text-black" weight="duotone" />}
-            <span className="text-[12px] sm:text-[13px] font-medium text-black">{tag.name}</span>
-          </div>
-        );
-      })}
-    </div>
-    <div className="flex items-center space-x-2.5 py-1.5 px-3 rounded-xl bg-green-50 border border-green-200 self-start shadow-sm mt-1">
-      <Image src="/whatsapp.svg" alt="WhatsApp" width={16} height={16} className="w-4 h-4" />
-      <span className="text-[11.5px] font-bold text-green-700 tracking-tight">Please check for availability</span>
-    </div>
+  <div className="flex flex-wrap items-center gap-y-2 gap-x-4 mt-1">
+    {kos.kos_tags?.map((tag) => {
+      const TagIcon = iconMap[tag.icon];
+      return (
+        <div key={tag.id} className="flex items-center space-x-1.5">
+          {TagIcon && <TagIcon className="w-5 h-5 text-[#111111]" weight="regular" />}
+          <span className="text-[15px] text-[#111111]">{tag.name}</span>
+        </div>
+      );
+    })}
   </div>
 );
 
-export default function MapsContent({ kosList }: { kosList: Kos[] }) {
-  const [filterLokasi, setFilterLokasi] = useState("Lokasi");
-  const [filterTipe, setFilterTipe] = useState("Tipe Kos");
-  const [filterHarga, setFilterHarga] = useState("Harga");
+interface MapsContentProps {
+  kosList: Kos[];
+  initialLocation?: string;
+  initialType?: string;
+  initialPrice?: string;
+}
+
+export default function MapsContent({ kosList, initialLocation, initialType, initialPrice }: MapsContentProps) {
+  const [filterLokasi, setFilterLokasi] = useState(initialLocation || "Lokasi");
+  const [filterTipe, setFilterTipe] = useState(initialType || "Tipe Kos");
+  const [filterHarga, setFilterHarga] = useState(initialPrice || "Harga");
 
   const filteredKosList = kosList.filter((kos) => {
     if (filterLokasi !== "Lokasi" && kos.city !== filterLokasi && kos.district !== filterLokasi) return false;
@@ -141,18 +142,20 @@ export default function MapsContent({ kosList }: { kosList: Kos[] }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {filteredKosList.map((kos) => (
                 <Link key={kos.id} href={`/detail/${kos.slug}`} className="group cursor-pointer block">
-                  <div className="relative w-full aspect-square rounded-[24px] overflow-hidden mb-4 bg-gray-100">
+                  <div className="relative w-full aspect-square rounded-[24px] overflow-hidden mb-5 bg-gray-100">
                     <Image src={kos.image_url || ""} alt={kos.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
                   </div>
-                  <h3 className="text-xl font-bold mb-1">{kos.name}</h3>
-                  <div className="flex items-center text-gray-500 mb-2 text-sm font-medium space-x-1.5">
-                    <MapPin className="w-4 h-4" weight="fill" />
-                    <span>{kos.district}, {kos.city}</span>
-                  </div>
-                  <KosTags kos={kos} />
-                  <div className="text-lg">
-                    <span className="font-bold text-[#E53E3E]">{formatPrice(kos.price)}</span>
-                    <span className="font-medium">/bulan</span>
+                  <div className="px-[12px]">
+                    <h3 className="text-[24px] font-semibold mb-2 text-[#111111]">{kos.name}</h3>
+                    <div className="flex items-center text-[#888888] mb-4 text-[15px] space-x-2">
+                      <MapPin className="w-5 h-5 text-[#B0B0B0]" weight="fill" />
+                      <span>{kos.district}, {kos.city}</span>
+                    </div>
+                    <KosTags kos={kos} />
+                    <div className="text-right mt-5">
+                      <span className="font-medium text-[#E53E3E] text-[20px]">{formatPrice(kos.price)}</span>
+                      <span className="font-medium text-[#111111] text-[20px]">/monthly</span>
+                    </div>
                   </div>
                 </Link>
               ))}

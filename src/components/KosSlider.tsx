@@ -112,9 +112,12 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
                     <span>{kos.district}, {kos.city}</span>
                   </div>
                   <KosTags kos={kos} />
-                  <div className="text-right mt-5">
-                    <span className="font-medium text-[#E53E3E] text-[20px]">{formatPrice(kos.price)}</span>
-                    <span className="font-medium text-[#111111] text-[20px]">/bulan</span>
+                  <div className="flex justify-between items-center mt-5">
+                    <span className="text-[#888888] text-[15px]">Start from</span>
+                    <div>
+                      <span className="font-medium text-[#E53E3E] text-[20px]">{formatPrice(kos.price)}</span>
+                      <span className="font-medium text-[#111111] text-[20px]">/monthly</span>
+                    </div>
                   </div>
                 </div>
               </Link>

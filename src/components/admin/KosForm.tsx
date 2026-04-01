@@ -432,8 +432,18 @@ export default function KosForm({ kosId }: KosFormProps) {
             </div>
             <div className="space-y-2">
               <Label className="text-zinc-300">Kota</Label>
-              <Input value={form.city} onChange={(e) => handleChange("city", e.target.value)}
-                className="bg-zinc-800 border-zinc-700 text-white" placeholder="Jakarta Selatan" />
+              <select 
+                value={form.city} 
+                onChange={(e) => handleChange("city", e.target.value)}
+                className="w-full rounded-md bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-600"
+              >
+                <option value="">Pilih Kota</option>
+                <option value="Jakarta Selatan">Jakarta Selatan</option>
+                <option value="Jakarta Pusat">Jakarta Pusat</option>
+                <option value="Jakarta Barat">Jakarta Barat</option>
+                <option value="Jakarta Timur">Jakarta Timur</option>
+                <option value="Jakarta Utara">Jakarta Utara</option>
+              </select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">

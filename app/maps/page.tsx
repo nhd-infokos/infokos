@@ -4,7 +4,8 @@ import { getKosList } from "@/services/kos.service";
 import MapsContent from "@/components/MapsContent";
 import Navbar from "@/components/Navbar";
 
-export default async function MapsPage() {
+export default async function MapsPage({ searchParams }: { searchParams: Promise<{ location?: string, type?: string, price?: string }> }) {
+  const { location, type, price } = await searchParams;
   const kosList = await getKosList();
 
   return (
@@ -13,7 +14,12 @@ export default async function MapsPage() {
       <Navbar />
 
       <main className="flex flex-col items-center w-full px-6 md:px-[50px] pb-16">
-        <MapsContent kosList={kosList} />
+        <MapsContent 
+          kosList={kosList} 
+          initialLocation={location}
+          initialType={type}
+          initialPrice={price}
+        />
       </main>
 
       {/* Footer */}

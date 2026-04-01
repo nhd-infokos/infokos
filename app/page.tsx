@@ -4,6 +4,7 @@ import {
   MapPin, Buildings, GenderIntersex, Money
 } from "@phosphor-icons/react/dist/ssr";
 import KosSlider from "@/components/KosSlider";
+import HomeSearchForm from "@/components/HomeSearchForm";
 import { getKosList } from "@/services/kos.service";
 import Navbar from "@/components/Navbar";
 
@@ -75,57 +76,8 @@ export default async function Home() {
           </div>
 
           {/* Filter Form - overlapping bottom */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-full max-w-[880px] px-4 hidden md:block">
-            <div className="flex items-center bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-2 w-full">
-              <div className="relative flex items-center flex-1 px-4 py-3 md:px-8">
-                <MapPin className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
-                <select className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6">
-                  <option>Lokasi</option>
-                  <option>Jakarta Selatan</option>
-                  <option>Jakarta Pusat</option>
-                  <option>Jakarta Barat</option>
-                  <option>Jakarta Timur</option>
-                  <option>Jakarta Utara</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                </div>
-              </div>
-
-              <div className="h-8 w-px bg-gray-300 shrink-0" />
-
-              <div className="relative flex items-center flex-1 px-4 py-3 md:px-8">
-                <Money className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
-                <select className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6">
-                  <option>Harga</option>
-                  <option>&lt; 1 Juta</option>
-                  <option>1 - 2 Juta</option>
-                  <option>&gt; 2 Juta</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                </div>
-              </div>
-
-              <div className="h-8 w-px bg-gray-300 shrink-0" />
-
-              <div className="relative flex items-center flex-1 px-4 py-3 md:px-8">
-                <GenderIntersex className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
-                <select className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6">
-                  <option>Tipe Kos</option>
-                  <option>Putra</option>
-                  <option>Putri</option>
-                  <option>Campuran</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                </div>
-              </div>
-
-              <button className="ml-2 px-8 py-3.5 bg-black text-white text-[15px] font-semibold rounded-full hover:bg-gray-800 transition-colors whitespace-nowrap shrink-0">
-                Cari Kos
-              </button>
-            </div>
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-full max-w-[880px] px-4 md:block">
+            <HomeSearchForm />
           </div>
         </div>
 
@@ -137,46 +89,49 @@ export default async function Home() {
         <section className="w-full mt-24">
           <div className="bg-[#F0F0F0] rounded-[32px] flex flex-col md:flex-row items-center justify-between relative min-h-[400px] overflow-hidden">
             {/* Left Image */}
-            <div className="w-full md:w-[40%] h-[300px] md:h-[450px] relative hidden md:block">
+            <div className="w-full md:w-[35%] h-[300px] md:h-[450px] relative hidden md:block">
               <Image
-                src="/img-preview-daftarkos.png"
-                alt="Kos Preview"
+                src="/bg-section-faq1.webp"
+                alt="FAQ Area"
                 fill
-                className="object-cover object-left md:object-contain"
+                className="object-cover object-left"
               />
             </div>
 
             {/* Mobile Image */}
-            <div className="w-full h-[250px] relative block md:hidden mb-6 bg-white/10 rounded-t-[32px] overflow-hidden">
+            <div className="w-full h-[250px] relative block md:hidden bg-white/10 rounded-t-[32px] overflow-hidden">
               <Image
-                src="/img-preview-daftarkos.png"
-                alt="Kos Preview"
+                src="/bg-section-faq1.webp"
+                alt="FAQ Area"
                 fill
                 className="object-cover"
               />
             </div>
 
-            {/* Middle Title */}
-            <div className="w-full md:w-[30%] flex items-center justify-center px-4 mb-8 md:mb-0 z-10 w-full text-center md:text-left">
-              <h2 className="text-2xl md:text-[24px] font-bold leading-[1.3] text-black md:max-w-[250px] w-full ">
-                Mau Kosmu Cepat Terisi?
-              </h2>
+            {/* Middle Card */}
+            <div className="w-full md:flex-1 flex justify-center z-10 py-10 px-6 w-full">
+              <div className="bg-white rounded-[24px] p-8 pb-10 shadow-sm w-full max-w-[400px] text-center md:text-left">
+                <h3 className="text-[28px] font-bold text-[#111111] leading-[1.3] mb-4">
+                  Masih ada<br/>Pertanyaan?
+                </h3>
+                <p className="text-[15px] text-[#888888] font-medium leading-relaxed mb-8">
+                  Tim Nahdia siap bantu kamu nemuin tempat tinggal yang paling cocok. Nggak perlu formal - santai aja, Whatsapp langsung.
+                </p>
+                <a href="#" className="flex items-center justify-center gap-2 px-6 py-4 bg-[#25D366] text-white text-[15px] font-bold rounded-full hover:bg-[#20c05c] transition-colors w-fit mx-auto md:mx-0">
+                  <span>Chat via Whatsapp</span>
+                  <Image src="/whatsapp-white.svg" alt="Whatsapp" width={20} height={20} className="w-5 h-5" />
+                </a>
+              </div>
             </div>
 
-            {/* Right Card */}
-            <div className="w-full md:w-[30%] flex justify-center md:justify-end md:pr-10 z-10 pb-6 md:pb-0 px-6 md:pr-10 md:pl-0 w-full">
-              <div className="bg-white rounded-[24px] p-8 shadow-sm w-full max-w-[360px]">
-                <h3 className="text-[22px] font-bold text-[#111111] leading-[1.3] mb-4">
-                  Yuk, Listing-in Kosmu!
-                </h3>
-                <p className="text-[14px] text-[#888888] font-medium leading-relaxed mb-8">
-                  Biar gak kosong terus 😉 Daftar kosmu di sini, langsung dilirik banyak calon penghuni. Cepat, praktis, dan cuan makin lancar!
-                </p>
-                <button className="flex items-center justify-center gap-2 px-6 py-3 bg-black text-white text-[15px] font-semibold rounded-full hover:bg-gray-800 transition-colors w-full mt-2">
-                  <span>Daftarkan Kosmu Disini</span>
-                  <Buildings className="w-5 h-5" weight="duotone" />
-                </button>
-              </div>
+            {/* Right Image */}
+            <div className="w-full md:w-[35%] h-[300px] md:h-[450px] relative hidden md:block">
+              <Image
+                src="/bg-section-faq2.webp"
+                alt="FAQ Right Area"
+                fill
+                className="object-cover object-right"
+              />
             </div>
           </div>
         </section>
