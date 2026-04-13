@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -19,6 +19,7 @@ interface MapKos {
 interface MapProps {
   kosList?: MapKos[];
   className?: string;
+  center?: [number, number];
 }
 
 const createPriceIcon = (price: string) => {
@@ -30,7 +31,16 @@ const createPriceIcon = (price: string) => {
   });
 };
 
-export default function Map({ kosList: externalKosList, className }: MapProps) {
+// Helper component to update map view when center changes
+function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(center, zoom, { duration: 1.2 });
+  }, [center[0], center[1], zoom, map]);
+  return null;
+}
+
+export default function Map({ kosList: externalKosList, className, center: externalCenter }: MapProps) {
   const router = useRouter();
   const [mapId, setMapId] = useState("");
   const [internalKosList, setInternalKosList] = useState<MapKos[]>([]);
@@ -54,7 +64,8 @@ export default function Map({ kosList: externalKosList, className }: MapProps) {
   }, [externalKosList]);
 
   const kosList = externalKosList ?? internalKosList;
-  const position: [number, number] = [-6.2615, 106.8106];
+  const defaultCenter: [number, number] = [-6.2615, 106.8106];
+  const position = externalCenter || defaultCenter;
 
   if (!mapId) {
     return (
@@ -74,6 +85,7 @@ export default function Map({ kosList: externalKosList, className }: MapProps) {
         className="w-full h-full"
         id="map"
       >
+        <ChangeView center={position} zoom={13} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

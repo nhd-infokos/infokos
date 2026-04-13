@@ -43,6 +43,7 @@ export default function HomeSearchForm() {
           <option value="Jakarta Barat">Jakarta Barat</option>
           <option value="Jakarta Timur">Jakarta Timur</option>
           <option value="Jakarta Utara">Jakarta Utara</option>
+          <option value="Bali">Bali</option>
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
           <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
@@ -81,6 +82,7 @@ export default function HomeSearchForm() {
           <option value="Putra">Putra</option>
           <option value="Putri">Putri</option>
           <option value="Campuran">Campuran</option>
+          <option value="Kontrakan">Kontrakan</option>
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
           <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
@@ -135,6 +137,7 @@ export default function HomeSearchForm() {
                   <option value="Jakarta Barat">Jakarta Barat</option>
                   <option value="Jakarta Timur">Jakarta Timur</option>
                   <option value="Jakarta Utara">Jakarta Utara</option>
+                  <option value="Bali">Bali</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
                   <CaretDown className="w-5 h-5 text-gray-500 hidden" />
@@ -166,6 +169,7 @@ export default function HomeSearchForm() {
                   <option value="Putra">Putra</option>
                   <option value="Putri">Putri</option>
                   <option value="Campuran">Campuran</option>
+                  <option value="Kontrakan">Kontrakan</option>
                 </select>
               </div>
             </div>

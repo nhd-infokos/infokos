@@ -4,7 +4,7 @@ import {
   Car, Motorcycle, Key, Wind, Drop, Lightning, Broom,
   Desk, Chair, WashingMachine, FirstAid,
   Fan, Thermometer, ForkKnife, Lamp, Plant, Cat, Dog, Tree,
-  Couch, Stairs, SecurityCamera, CoatHanger, Door, GenderFemale, Train, TrainSimple, ShieldCheck
+  Couch, Stairs, SecurityCamera, CoatHanger, Door, GenderFemale, GenderMale, Train, TrainSimple, Hospital, Bathtub, Lockers, ShieldCheck
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
 
@@ -45,7 +45,11 @@ export const iconMap: Record<string, ComponentType<any>> = {
   CoatHanger,
   Door,
   GenderFemale,
+  GenderMale,
   Train,
   TrainSimple,
+  Hospital,
+  Bathtub,
+  Lockers,
   ShieldCheck
 };

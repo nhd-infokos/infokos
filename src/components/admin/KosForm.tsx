@@ -443,6 +443,7 @@ export default function KosForm({ kosId }: KosFormProps) {
                 <option value="Jakarta Barat">Jakarta Barat</option>
                 <option value="Jakarta Timur">Jakarta Timur</option>
                 <option value="Jakarta Utara">Jakarta Utara</option>
+                <option value="Bali">Bali</option>
               </select>
             </div>
           </div>
@@ -473,6 +474,7 @@ export default function KosForm({ kosId }: KosFormProps) {
                 <option value="putra">Putra</option>
                 <option value="putri">Putri</option>
                 <option value="campur">Campur</option>
+                <option value="kontrakan">Kontrakan</option>
               </select>
             </div>
             <div className="space-y-2">

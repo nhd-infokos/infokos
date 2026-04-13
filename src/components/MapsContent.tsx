@@ -9,6 +9,18 @@ import type { Kos } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
 import { formatPrice } from "@/lib/utils";
 
+// Coordinate centers for each location option
+const LOCATION_CENTERS: Record<string, [number, number]> = {
+  "Jakarta Selatan": [-6.2615, 106.8106],
+  "Jakarta Pusat":  [-6.1862, 106.8340],
+  "Jakarta Barat":  [-6.1680, 106.7580],
+  "Jakarta Timur":  [-6.2250, 106.9004],
+  "Jakarta Utara":  [-6.1384, 106.8638],
+  "Bali":            [-8.4095, 115.1889],
+};
+
+const DEFAULT_CENTER: [number, number] = [-6.2088, 106.8456]; // General Jakarta center
+
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
   loading: () => (
@@ -69,6 +81,9 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
       price: k.price,
     }));
 
+  // Determine map center based on selected location
+  const mapCenter = LOCATION_CENTERS[filterLokasi] || DEFAULT_CENTER;
+
   return (
     <>
       <div className="flex flex-col items-center mb-8 text-center mt-6">
@@ -92,6 +107,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
               <option value="Jakarta Barat">Jakarta Barat</option>
               <option value="Jakarta Timur">Jakarta Timur</option>
               <option value="Jakarta Utara">Jakarta Utara</option>
+              <option value="Bali">Bali</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
@@ -109,6 +125,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
               <option value="Putra">Putra</option>
               <option value="Putri">Putri</option>
               <option value="Campuran">Campuran</option>
+              <option value="Kontrakan">Kontrakan</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
@@ -175,6 +192,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
         <div className="w-full lg:w-1/2 lg:sticky lg:top-6 h-[500px] lg:h-[700px]">
           <Map
             kosList={mapKosList}
+            center={mapCenter}
             className="w-full h-full rounded-[24px] overflow-hidden shadow-sm border border-gray-100 relative z-0"
           />
         </div>

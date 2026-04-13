@@ -14,6 +14,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Cari Kos Modern - Carikos",
   description: "Cari kos modern yang tenang, nyaman, dan siap jadi tempat pulang terbaikmu setiap hari.",
+  icons: {
+    icon: "/img-webp/favicon-nhd.png",
+  },
 };
 
 export default function RootLayout({
