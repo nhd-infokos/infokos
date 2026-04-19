@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Trash2, Edit2, MapPin, Monitor, Smartphone } from "lucide-react";
+import { Trash2, Edit2, MapPin, Monitor, Smartphone, Video } from "lucide-react";
 
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -52,6 +52,7 @@ export default function MarkerManager({ kosId }: MarkerManagerProps) {
     name: "",
     description: "",
     image_url: "",
+    video_url: "",
     marker_top: "50%",
     marker_left: "50%",
     marker_mobile_top: "50%",
@@ -90,6 +91,7 @@ export default function MarkerManager({ kosId }: MarkerManagerProps) {
         name: "",
         description: "",
         image_url: "",
+        video_url: "",
         marker_top: "50%",
         marker_left: "50%",
         marker_mobile_top: "50%",
@@ -427,6 +429,27 @@ export default function MarkerManager({ kosId }: MarkerManagerProps) {
             <div className="grid gap-2">
               <Label htmlFor="desc" className="text-zinc-300">Deskripsi</Label>
               <Textarea id="desc" value={form.description || ""} onChange={(e) => setForm({...form, description: e.target.value})} className="bg-zinc-800 border-zinc-700 text-white" placeholder="Detail ruangan..." />
+            </div>
+
+            {/* Video Embed URL */}
+            <div className="grid gap-2">
+              <Label htmlFor="video_url" className="text-zinc-300 flex items-center gap-2">
+                <Video className="w-4 h-4" /> Link Video Embed (Opsional)
+              </Label>
+              <Input 
+                id="video_url" 
+                value={form.video_url || ""} 
+                onChange={(e) => setForm({...form, video_url: e.target.value})} 
+                className="bg-zinc-800 border-zinc-700 text-white" 
+                placeholder="https://www.tiktok.com/@user/video/... atau https://www.instagram.com/reel/..." 
+              />
+              <p className="text-xs text-zinc-500">Tempel link dari TikTok, Instagram Reels, atau YouTube Shorts. Video akan tampil di halaman depan saat marker diklik.</p>
+              {form.video_url && (
+                <div className="mt-1 p-2 bg-zinc-800/60 rounded-lg border border-zinc-700">
+                  <p className="text-xs text-green-400 mb-1">✓ Link video tersimpan</p>
+                  <p className="text-xs text-zinc-400 truncate">{form.video_url}</p>
+                </div>
+              )}
             </div>
 
             {/* Image Upload */}
