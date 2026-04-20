@@ -4,7 +4,8 @@ import {
   Car, Motorcycle, Key, Wind, Drop, Lightning, Broom,
   Desk, Chair, WashingMachine, FirstAid,
   Fan, Thermometer, ForkKnife, Lamp, Plant, Cat, Dog, Tree,
-  Couch, Stairs, SecurityCamera, CoatHanger, Door, GenderFemale, GenderMale, Train, TrainSimple, Hospital, Bathtub, Lockers, ShieldCheck
+  Couch, Stairs, SecurityCamera, CoatHanger, Door, GenderFemale, GenderMale, Train, TrainSimple, Hospital, Bathtub, Lockers, ShieldCheck,
+  GenderNeuter, HouseLine, Lock, Dresser, WindowsLogo, Visor, TelevisionSimple, Tray, HairDryer, CookingPot, Warehouse, Bus, BuildingOffice
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
 
@@ -51,5 +52,18 @@ export const iconMap: Record<string, ComponentType<any>> = {
   Hospital,
   Bathtub,
   Lockers,
-  ShieldCheck
+  ShieldCheck,
+  GenderNeuter,
+  HouseLine,
+  Lock,
+  Dresser,
+  WindowsLogo,
+  Visor,
+  TelevisionSimple,
+  Tray,
+  HairDryer,
+  CookingPot,
+  Warehouse,
+  Bus,
+  BuildingOffice
 };
