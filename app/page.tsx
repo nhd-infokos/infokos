@@ -6,10 +6,12 @@ import {
 import KosSlider from "@/components/KosSlider";
 import HomeSearchForm from "@/components/HomeSearchForm";
 import { getKosList } from "@/services/kos.service";
+import { getActiveBanner } from "@/services/banner.service";
 import Navbar from "@/components/Navbar";
 
 export default async function Home() {
   const kosList = await getKosList();
+  const banner = await getActiveBanner();
 
   return (
     <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white pt-6 overflow-x-clip">
@@ -19,16 +21,27 @@ export default async function Home() {
       <main className="flex flex-col items-center w-full px-[50px] pb-16">
         {/* Hero Banner */}
         <div className="relative w-full mb-12 lg:mb-20">
-          <div className="relative w-full aspect-[16/7] md:aspect-[16/6] min-h-[400px] md:min-h-[520px] rounded-[24px] md:rounded-[32px] overflow-hidden">
-            <Image src="/img-webp/bg-banner.webp" alt="Hero Banner" fill className="object-cover" priority />
-            <div className="absolute inset-0 bg-black/30" />
-
-            {/* Center Text */}
-            <div className="absolute inset-0 flex items-center justify-center px-6">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] font-bold leading-[1.25] tracking-tight text-white text-center max-w-[800px]" style={{ fontFamily: "var(--font-poppins)" }}>
-                Cari kos modern yang tenang, nyaman, dan siap jadi tempat pulang terbaikmu setiap hari.
-              </h1>
-            </div>
+          <div className="relative w-full aspect-[16/7] md:aspect-[16/6] min-h-[400px] md:min-h-[540px] rounded-[24px] md:rounded-[32px] overflow-hidden">
+            {/* Desktop Banner */}
+            {banner?.desktop_image_url && (
+              <Image
+                src={banner.desktop_image_url}
+                alt="Hero Banner Desktop"
+                fill
+                className="object-cover hidden md:block"
+                priority
+              />
+            )}
+            {/* Mobile Banner */}
+            {banner?.mobile_image_url && (
+              <Image
+                src={banner.mobile_image_url}
+                alt="Hero Banner Mobile"
+                fill
+                className="object-cover block md:hidden"
+                priority
+              />
+            )}
 
             {/* Arrow Left */}
             <button className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 hover:opacity-80 transition-opacity" aria-label="Previous">
@@ -112,7 +125,7 @@ export default async function Home() {
             <div className="w-full md:flex-1 flex justify-center z-10 py-10 px-6 w-full">
               <div className="bg-white rounded-[24px] p-8 pb-10 shadow-sm w-full max-w-[400px] text-center md:text-left">
                 <h3 className="text-[28px] font-bold text-[#111111] leading-[1.3] mb-4">
-                  Masih ada<br/>Pertanyaan?
+                  Masih ada<br />Pertanyaan?
                 </h3>
                 <p className="text-[15px] text-[#888888] font-medium leading-relaxed mb-8">
                   Tim Nahdia siap bantu kamu nemuin tempat tinggal yang paling cocok. Nggak perlu formal - santai aja, Whatsapp langsung.

@@ -25,7 +25,16 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const timestamp = Date.now()
     const safeName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9-_]/g, '_')
-    const fileName = `${kosId}/${type}-${safeName}-${timestamp}.webp`
+    
+    let fileName = '';
+    if (type.startsWith('banner')) {
+      fileName = `banners/${type}-${safeName}-${timestamp}.webp`;
+    } else {
+      if (!kosId) {
+        return NextResponse.json({ error: 'kosId is required for this upload type' }, { status: 400 })
+      }
+      fileName = `${kosId}/${type}-${safeName}-${timestamp}.webp`;
+    }
 
     // Upload to Supabase Storage
     const supabase = createSupabaseAdmin()

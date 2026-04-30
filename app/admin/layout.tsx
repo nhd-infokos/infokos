@@ -23,6 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const navItems = [
+    { href: "/admin/banner", label: "Kelola Banner" },
     { href: "/admin/kos", label: "Kelola Kos" },
   ];
 
