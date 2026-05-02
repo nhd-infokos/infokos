@@ -44,10 +44,15 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex items-center justify-end flex-1 hidden sm:flex">
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors shadow-lg shadow-black/20">
+        <Link 
+          href="https://wa.me/6289601837144?text=Hi%20Nahdia%20Saya%20Ingin%20Mendaftarkan%20Kos"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors shadow-lg shadow-black/20"
+        >
           <span>Daftarkan Kosmu Disini</span>
           <Buildings className="w-5 h-5" weight="duotone" />
-        </button>
+        </Link>
       </div>
 
       <div className="flex items-center sm:hidden">
@@ -91,10 +96,16 @@ export default function Navbar() {
             </Link>
           </div>
           <div className="mt-10">
-            <button className="flex items-center justify-center gap-2 px-5 py-3.5 bg-black text-white text-[16px] font-medium rounded-full w-full shadow-lg shadow-black/20">
+            <Link 
+              href="https://wa.me/6289601837144?text=Hi%20Nahdia%20Saya%20Ingin%20Mendaftarkan%20Kos"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-2 px-5 py-3.5 bg-black text-white text-[16px] font-medium rounded-full w-full shadow-lg shadow-black/20"
+            >
               <span>Daftarkan Kosmu Disini</span>
               <Buildings className="w-5 h-5" weight="duotone" />
-            </button>
+            </Link>
           </div>
         </div>
       )}

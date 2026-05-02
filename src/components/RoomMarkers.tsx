@@ -138,7 +138,7 @@ export default function RoomMarkers({ rooms }: { rooms: KosRoom[] }) {
             </button>
             {activeRoom.image_url && (
               <div className="relative w-full aspect-[3/4] rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
-                <Image src={activeRoom.image_url} alt={activeRoom.name} fill className="object-cover" />
+                <Image src={activeRoom.image_url} alt={activeRoom.name} fill className="object-cover" loading="lazy" />
               </div>
             )}
             

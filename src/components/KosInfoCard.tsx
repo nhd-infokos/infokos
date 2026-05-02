@@ -13,6 +13,7 @@ interface KosInfoCardProps {
 
 export default function KosInfoCard({ kos, mapEmbedUrl }: KosInfoCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   const cardContent = (
     <>
@@ -51,12 +52,25 @@ export default function KosInfoCard({ kos, mapEmbedUrl }: KosInfoCardProps) {
         </div>
       )}
 
-      {/* Map Location */}
+      {/* Map Location — Lazy Loaded */}
       {mapEmbedUrl && (
         <div className="mt-6 md:mt-8">
           <h3 className="text-xl font-bold tracking-tight mb-4 text-white">Lokasi</h3>
           <div className="relative w-full h-[150px] md:h-[180px] rounded-xl overflow-hidden bg-white/10 border border-white/20 shadow-inner">
-            <iframe src={mapEmbedUrl} className="absolute inset-0 w-full h-full" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+            {showMap ? (
+              <iframe src={mapEmbedUrl} className="absolute inset-0 w-full h-full" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+            ) : (
+              <button
+                onClick={() => setShowMap(true)}
+                className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <svg className="w-8 h-8 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="text-white/70 text-xs font-medium">Klik untuk lihat peta</span>
+              </button>
+            )}
           </div>
         </div>
       )}

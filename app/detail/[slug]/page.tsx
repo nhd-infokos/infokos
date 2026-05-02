@@ -2,10 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import type { KosRoom } from "@/types/kos";
 import { getKosBySlug } from "@/services/kos.service";
-import { getRoomsByKosSlug } from "@/services/room.service";
+import { getRoomsByKosId } from "@/services/room.service";
 import RoomMarkers from "@/components/RoomMarkers";
 import Navbar from "@/components/Navbar";
 import KosInfoCard from "@/components/KosInfoCard";
+
+// Cache halaman selama 5 menit di server
+export const revalidate = 300;
 
 export default async function DetailKos({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -14,12 +17,11 @@ export default async function DetailKos({ params }: { params: Promise<{ slug: st
   let rooms: KosRoom[] = [];
 
   try {
-    const [kosData, roomsData] = await Promise.all([
-      getKosBySlug(slug),
-      getRoomsByKosSlug(slug),
-    ]);
-    kos = kosData;
-    rooms = roomsData || [];
+    // Fetch kos first, then use its id for rooms (avoids redundant slug→id lookup)
+    kos = await getKosBySlug(slug);
+    if (kos) {
+      rooms = (await getRoomsByKosId(kos.id)) || [];
+    }
   } catch (err) {
     console.error("Error fetching kos detail:", err);
   }
