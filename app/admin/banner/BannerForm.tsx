@@ -4,12 +4,18 @@ import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { saveBannerSettings } from './actions'
+import { createBannerAction, updateBannerAction } from './actions'
 import { toast } from 'sonner'
 import type { Banner } from '@/services/banner.service'
 import { Upload, X } from 'lucide-react'
 
-export default function BannerForm({ initialBanner }: { initialBanner: Banner | null }) {
+interface BannerFormProps {
+  initialBanner?: Banner | null
+  onSuccess: () => void
+  onCancel: () => void
+}
+
+export default function BannerForm({ initialBanner, onSuccess, onCancel }: BannerFormProps) {
   const [desktopImage, setDesktopImage] = useState(initialBanner?.desktop_image_url || '')
   const [mobileImage, setMobileImage] = useState(initialBanner?.mobile_image_url || '')
   const [isUploading, setIsUploading] = useState(false)
@@ -56,25 +62,34 @@ export default function BannerForm({ initialBanner }: { initialBanner: Banner | 
     }
 
     setIsSaving(true)
-    const result = await saveBannerSettings({
-      desktop_image_url: desktopImage,
-      mobile_image_url: mobileImage,
-    })
+    let result;
+    if (initialBanner?.id) {
+      result = await updateBannerAction(initialBanner.id, {
+        desktop_image_url: desktopImage,
+        mobile_image_url: mobileImage,
+      })
+    } else {
+      result = await createBannerAction({
+        desktop_image_url: desktopImage,
+        mobile_image_url: mobileImage,
+      })
+    }
 
     if (result.error) {
       toast.error(result.error)
     } else {
-      toast.success('Pengaturan banner berhasil disimpan')
+      toast.success(initialBanner ? 'Banner berhasil diperbarui' : 'Banner berhasil ditambahkan')
+      onSuccess()
     }
     setIsSaving(false)
   }
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <Card className="bg-zinc-900 border-zinc-800 text-white">
-          <CardHeader>
-            <CardTitle>Banner Desktop</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Banner Desktop</CardTitle>
             <CardDescription className="text-zinc-400">
               Rekomendasi ukuran: 1440 x 540 px (atau proporsi 16:6)
             </CardDescription>
@@ -112,7 +127,7 @@ export default function BannerForm({ initialBanner }: { initialBanner: Banner | 
             />
             <Button 
               variant="outline" 
-              className="w-full border-zinc-700 text-zinc-300 hover:text-white"
+              className="w-full border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800"
               onClick={() => desktopInputRef.current?.click()}
               disabled={isUploading}
             >
@@ -122,14 +137,14 @@ export default function BannerForm({ initialBanner }: { initialBanner: Banner | 
         </Card>
 
         <Card className="bg-zinc-900 border-zinc-800 text-white">
-          <CardHeader>
-            <CardTitle>Banner Mobile</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Banner Mobile</CardTitle>
             <CardDescription className="text-zinc-400">
               Rekomendasi proporsi: 16:7 atau Kotak (1:1)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="relative aspect-[16/7] w-full max-w-xs mx-auto bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700 flex items-center justify-center">
+            <div className="relative aspect-[16/7] w-full max-w-[200px] mx-auto bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700 flex items-center justify-center">
               {mobileImage ? (
                 <>
                   <Image src={mobileImage} alt="Mobile Banner" fill className="object-cover" />
@@ -161,7 +176,7 @@ export default function BannerForm({ initialBanner }: { initialBanner: Banner | 
             />
             <Button 
               variant="outline" 
-              className="w-full border-zinc-700 text-zinc-300 hover:text-white"
+              className="w-full border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800"
               onClick={() => mobileInputRef.current?.click()}
               disabled={isUploading}
             >
@@ -171,9 +186,12 @@ export default function BannerForm({ initialBanner }: { initialBanner: Banner | 
         </Card>
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-zinc-800">
+      <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
+        <Button variant="outline" onClick={onCancel} className="border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800">
+          Batal
+        </Button>
         <Button onClick={handleSave} disabled={isSaving || isUploading} className="bg-white text-black hover:bg-zinc-200">
-          {isSaving ? 'Menyimpan...' : 'Simpan Perubahan Banner'}
+          {isSaving ? 'Menyimpan...' : 'Simpan Banner'}
         </Button>
       </div>
     </div>
