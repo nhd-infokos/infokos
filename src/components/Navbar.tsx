@@ -20,31 +20,31 @@ export default function Navbar() {
       <div className="flex items-center flex-1">
         <Link href="/" className="flex items-center gap-3 w-fit">
           <Image src="/nhdlogo.svg" alt="NHD Logo" width={50} height={39} priority className="w-auto h-8 sm:h-10 cursor-pointer" />
-          <span className="text-[24px] sm:text-[32px] font-medium tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>Nahdia Infokost</span>
+          <span className="text-[24px] sm:text-[32px] font-bold tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>Nahdia Infokost</span>
         </Link>
       </div>
       <div className="hidden sm:flex justify-center items-center space-x-8">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className={`text-[15px] transition-colors ${isHomeActive ? "font-bold text-black hover:text-gray-600" : "font-regular text-gray-500 hover:text-black"}`}
         >
           Home
         </Link>
-        <Link 
-          href="/maps" 
+        <Link
+          href="/maps"
           className={`text-[15px] transition-colors ${isMapsActive ? "font-bold text-black hover:text-gray-600" : "font-regular text-gray-500 hover:text-black"}`}
         >
           Maps
         </Link>
-        <Link 
-          href="/why-nahdia" 
+        <Link
+          href="/why-nahdia"
           className={`text-[15px] transition-colors ${isWhyNahdiaActive ? "font-bold text-black hover:text-gray-600" : "font-regular text-gray-500 hover:text-black"}`}
         >
           Why Nahdia
         </Link>
       </div>
       <div className="flex items-center justify-end flex-1 hidden sm:flex">
-        <Link 
+        <Link
           href="https://wa.me/6289601837144?text=Hi%20Nahdia%20Saya%20Ingin%20Mendaftarkan%20Kos"
           target="_blank"
           rel="noopener noreferrer"
@@ -73,22 +73,22 @@ export default function Navbar() {
             </button>
           </div>
           <div className="flex flex-col space-y-6">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               onClick={() => setIsMobileMenuOpen(false)}
               className={`text-[20px] pb-4 border-b border-gray-100 ${isHomeActive ? "font-bold text-black" : "font-medium text-gray-500"}`}
             >
               Home
             </Link>
-            <Link 
-              href="/maps" 
+            <Link
+              href="/maps"
               onClick={() => setIsMobileMenuOpen(false)}
               className={`text-[20px] pb-4 border-b border-gray-100 ${isMapsActive ? "font-bold text-black" : "font-medium text-gray-500"}`}
             >
               Maps
             </Link>
-            <Link 
-              href="/why-nahdia" 
+            <Link
+              href="/why-nahdia"
               onClick={() => setIsMobileMenuOpen(false)}
               className={`text-[20px] pb-4 border-b border-gray-100 ${isWhyNahdiaActive ? "font-bold text-black" : "font-medium text-gray-500"}`}
             >
@@ -96,7 +96,7 @@ export default function Navbar() {
             </Link>
           </div>
           <div className="mt-10">
-            <Link 
+            <Link
               href="https://wa.me/6289601837144?text=Hi%20Nahdia%20Saya%20Ingin%20Mendaftarkan%20Kos"
               target="_blank"
               rel="noopener noreferrer"

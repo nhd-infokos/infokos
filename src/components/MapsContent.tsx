@@ -57,14 +57,23 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
   const [filterHarga, setFilterHarga] = useState(initialPrice || "Harga");
 
   const filteredKosList = kosList.filter((kos) => {
+    // Location filter
     if (filterLokasi !== "Lokasi" && kos.city !== filterLokasi && kos.district !== filterLokasi) return false;
-    if (filterTipe !== "Tipe Kos" && kos.gender_label !== filterTipe && kos.kos_type !== filterTipe) return false;
 
+    // Type filter — strict case-insensitive comparison
+    if (filterTipe !== "Tipe Kos") {
+      const filterLower = filterTipe.toLowerCase();
+      const genderLabel = (kos.gender_label || "").toLowerCase();
+      const kosType = (kos.kos_type || "").toLowerCase();
+
+      if (genderLabel !== filterLower && kosType !== filterLower) return false;
+    }
+
+    // Price filter
     if (filterHarga !== "Harga") {
       const price = kos.price || 0;
-      if (filterHarga === "< 1 Juta" && price >= 1000000) return false;
       if (filterHarga === "1 - 2 Juta" && (price < 1000000 || price > 2000000)) return false;
-      if (filterHarga === "> 2 Juta" && price <= 2000000) return false;
+      if (filterHarga === "> 3 Juta" && price <= 3000000) return false;
     }
 
     return true;
@@ -124,7 +133,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
               <option value="Tipe Kos">Tipe Kos</option>
               <option value="Putra">Putra</option>
               <option value="Putri">Putri</option>
-              <option value="Campuran">Campuran</option>
+              <option value="Campur">Campur</option>
               <option value="Kontrakan">Kontrakan</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
@@ -140,9 +149,8 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
               onChange={(e) => setFilterHarga(e.target.value)}
             >
               <option value="Harga">Harga</option>
-              <option value="< 1 Juta">&lt; 1 Juta</option>
               <option value="1 - 2 Juta">1 - 2 Juta</option>
-              <option value="> 2 Juta">&gt; 2 Juta</option>
+              <option value="> 3 Juta">&gt; 3 Juta</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>

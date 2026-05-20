@@ -94,7 +94,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <section className="w-full mt-24 mb-10 overflow-hidden">
+        <section className="w-full mt-24 mb-10">
           <KosSlider kosList={kosList} />
         </section>
 

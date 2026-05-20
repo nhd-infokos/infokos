@@ -93,7 +93,7 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
       </div>
 
       {/* Right Cards Slider */}
-      <div className="w-full lg:w-[70%]">
+      <div className="w-full lg:flex-1 min-w-0">
         <div
           ref={sliderRef}
           className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 pt-2 pr-[50px] [&::-webkit-scrollbar]:hidden"
