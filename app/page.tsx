@@ -130,7 +130,7 @@ export default async function Home() {
                 <p className="text-[15px] text-[#888888] font-medium leading-relaxed mb-8">
                   Tim Nahdia siap bantu kamu nemuin tempat tinggal yang paling cocok. Nggak perlu formal - santai aja, Whatsapp langsung.
                 </p>
-                <a href="#" className="flex items-center justify-center gap-2 px-6 py-4 bg-[#25D366] text-white text-[15px] font-bold rounded-full hover:bg-[#20c05c] transition-colors w-fit mx-auto md:mx-0">
+                <a href="https://wa.me/6289601837144" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-6 py-4 bg-[#25D366] text-white text-[15px] font-bold rounded-full hover:bg-[#20c05c] transition-colors w-fit mx-auto md:mx-0">
                   <span>Chat via Whatsapp</span>
                   <Image src="/whatsapp-white.svg" alt="Whatsapp" width={20} height={20} className="w-5 h-5" />
                 </a>
