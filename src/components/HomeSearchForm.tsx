@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { MapPin, GenderIntersex, Money, CaretDown, X } from "@phosphor-icons/react";
+import { MapPin, GenderIntersex, Money, CaretDown, X, MagnifyingGlass } from "@phosphor-icons/react";
 
 export default function HomeSearchForm() {
   const router = useRouter();
   const [location, setLocation] = useState("Lokasi");
-  const [price, setPrice] = useState("Harga");
+  const [price, setPrice] = useState("Budget");
   const [type, setType] = useState("Tipe Kos");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -20,7 +20,7 @@ export default function HomeSearchForm() {
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (location !== "Lokasi") params.set("location", location);
-    if (price !== "Harga") params.set("price", price);
+    if (price !== "Budget") params.set("price", price);
     if (type !== "Tipe Kos") params.set("type", type);
     
     setIsMobileOpen(false);
@@ -32,69 +32,78 @@ export default function HomeSearchForm() {
       <div className="hidden md:flex flex-col bg-white rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-6 md:p-8 w-full">
         <h2 className="text-[20px] font-medium text-gray-900 mb-6 pl-2">Hai, mau cari kos di mana?</h2>
         <div className="flex items-center w-full">
-          <div className="relative flex items-center flex-1 px-4 py-2 md:px-6">
-            <MapPin className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
-            <select 
-              className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            >
-              <option value="Lokasi">Lokasi</option>
-              <option value="Jakarta Selatan">Jakarta Selatan</option>
-              <option value="Jakarta Pusat">Jakarta Pusat</option>
-              <option value="Jakarta Barat">Jakarta Barat</option>
-              <option value="Jakarta Timur">Jakarta Timur</option>
-              <option value="Jakarta Utara">Jakarta Utara</option>
-              <option value="Bali">Bali</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+          <div className="relative flex items-center flex-1 px-4 py-2 md:px-6 group">
+            <MapPin className="w-6 h-6 text-gray-900 mr-3 shrink-0" weight="regular" />
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-[15px] font-semibold text-gray-900 leading-tight">Lokasi</span>
+              <select 
+                className="appearance-none w-full bg-transparent text-[14px] text-gray-500 focus:outline-none cursor-pointer pr-6 mt-0.5 truncate"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              >
+                <option value="Lokasi">pilih lokasi</option>
+                <option value="Jakarta Selatan">Jakarta Selatan</option>
+                <option value="Jakarta Pusat">Jakarta Pusat</option>
+                <option value="Jakarta Barat">Jakarta Barat</option>
+                <option value="Jakarta Timur">Jakarta Timur</option>
+                <option value="Jakarta Utara">Jakarta Utara</option>
+                <option value="Bali">Bali</option>
+              </select>
+            </div>
+            <div className="pointer-events-none absolute right-4 md:right-6 flex items-center text-gray-900">
+              <CaretDown className="w-4 h-4" weight="bold" />
             </div>
           </div>
 
           <div className="h-8 w-px bg-gray-300 shrink-0" />
 
-          <div className="relative flex items-center flex-1 px-4 py-2 md:px-6">
-            <Money className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
-            <select 
-              className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            >
-              <option value="Harga">Harga</option>
-              <option value="1 - 2 Juta">1 - 2 Juta</option>
-              <option value="> 3 Juta">&gt; 3 Juta</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+          <div className="relative flex items-center flex-1 px-4 py-2 md:px-6 group">
+            <Money className="w-6 h-6 text-gray-900 mr-3 shrink-0" weight="regular" />
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-[15px] font-semibold text-gray-900 leading-tight">Budget</span>
+              <select 
+                className="appearance-none w-full bg-transparent text-[14px] text-gray-500 focus:outline-none cursor-pointer pr-6 mt-0.5 truncate"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              >
+                <option value="Budget">pilih budget</option>
+                <option value="1 - 2 Juta">1 - 2 Juta</option>
+                <option value="> 3 Juta">&gt; 3 Juta</option>
+              </select>
+            </div>
+            <div className="pointer-events-none absolute right-4 md:right-6 flex items-center text-gray-900">
+              <CaretDown className="w-4 h-4" weight="bold" />
             </div>
           </div>
 
           <div className="h-8 w-px bg-gray-300 shrink-0" />
 
-          <div className="relative flex items-center flex-1 px-4 py-2 md:px-6">
-            <GenderIntersex className="w-5 h-5 text-gray-900 mr-2 shrink-0" weight="duotone" />
-            <select 
-              className="appearance-none w-full bg-transparent text-[15px] font-medium text-gray-800 focus:outline-none cursor-pointer pr-6"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
-              <option value="Tipe Kos">Tipe Kos</option>
-              <option value="Putra">Putra</option>
-              <option value="Putri">Putri</option>
-              <option value="Campur">Campur</option>
-              <option value="Kontrakan">Kontrakan</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 md:right-6 flex items-center text-gray-900">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+          <div className="relative flex items-center flex-1 px-4 py-2 md:px-6 group">
+            <GenderIntersex className="w-6 h-6 text-gray-900 mr-3 shrink-0" weight="regular" />
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-[15px] font-semibold text-gray-900 leading-tight">Tipe Kos</span>
+              <select 
+                className="appearance-none w-full bg-transparent text-[14px] text-gray-500 focus:outline-none cursor-pointer pr-6 mt-0.5 truncate"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+              >
+                <option value="Tipe Kos">pilih tipe kos</option>
+                <option value="Putra">Putra</option>
+                <option value="Putri">Putri</option>
+                <option value="Campur">Campur</option>
+                <option value="Kontrakan">Kontrakan</option>
+              </select>
+            </div>
+            <div className="pointer-events-none absolute right-4 md:right-6 flex items-center text-gray-900">
+              <CaretDown className="w-4 h-4" weight="bold" />
             </div>
           </div>
 
           <button 
             onClick={handleSearch}
-            className="ml-4 px-8 py-3.5 bg-black text-white text-[15px] font-semibold rounded-full hover:bg-gray-800 transition-colors whitespace-nowrap shrink-0"
+            className="ml-4 w-[52px] h-[52px] bg-black text-white rounded-full hover:bg-gray-800 transition-colors flex items-center justify-center shrink-0"
           >
-            Cari Kos
+            <MagnifyingGlass className="w-[22px] h-[22px] text-white" weight="duotone" />
           </button>
         </div>
       </div>
@@ -109,7 +118,7 @@ export default function HomeSearchForm() {
            <div className="flex flex-col">
              <span className="text-[16px] font-semibold text-black leading-tight mb-1">{location !== "Lokasi" ? location : "Lokasi"}</span>
              <span className="text-[13px] text-[#888888] font-medium leading-tight">
-               {price !== "Harga" ? price : "Harga"} • {type !== "Tipe Kos" ? type : "Tipe Kos"}
+               {price !== "Budget" ? price : "Budget"} • {type !== "Tipe Kos" ? type : "Tipe Kos"}
              </span>
            </div>
         </div>
@@ -133,7 +142,7 @@ export default function HomeSearchForm() {
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 >
-                  <option value="Lokasi">Lokasi</option>
+                  <option value="Lokasi">pilih lokasi</option>
                   <option value="Jakarta Selatan">Jakarta Selatan</option>
                   <option value="Jakarta Pusat">Jakarta Pusat</option>
                   <option value="Jakarta Barat">Jakarta Barat</option>
@@ -147,13 +156,13 @@ export default function HomeSearchForm() {
               </div>
 
               <div className="relative flex items-center">
-                <Money className="w-[26px] h-[26px] text-black mr-4" weight="duotone" />
+                <Money className="w-[26px] h-[26px] text-black mr-4" weight="regular" />
                 <select 
                   className="appearance-none w-full bg-transparent text-[18px] font-medium text-black focus:outline-none pr-6"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                 >
-                  <option value="Harga">Harga</option>
+                  <option value="Budget">pilih budget</option>
                   <option value="1 - 2 Juta">1 - 2 Juta</option>
                   <option value="> 3 Juta">&gt; 3 Juta</option>
                 </select>
@@ -166,7 +175,7 @@ export default function HomeSearchForm() {
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                 >
-                  <option value="Tipe Kos">Tipe Kos</option>
+                  <option value="Tipe Kos">pilih tipe kos</option>
                   <option value="Putra">Putra</option>
                   <option value="Putri">Putri</option>
                   <option value="Campur">Campur</option>
