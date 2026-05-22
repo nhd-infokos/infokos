@@ -33,7 +33,7 @@ export default function HomeSearchForm() {
         <h2 className="text-[20px] font-medium text-gray-900 mb-6 pl-2">Hai, mau cari kos di mana?</h2>
         <div className="flex items-center w-full">
           <div className="relative flex items-center flex-1 px-4 py-2 md:px-6 group">
-            <MapPin className="w-6 h-6 text-gray-900 mr-3 shrink-0" weight="regular" />
+            <MapPin className="w-6 h-6 text-black mr-3 shrink-0" weight="duotone" />
             <div className="flex flex-col flex-1 min-w-0">
               <span className="text-[15px] font-semibold text-gray-900 leading-tight">Lokasi</span>
               <select 
@@ -58,7 +58,7 @@ export default function HomeSearchForm() {
           <div className="h-8 w-px bg-gray-300 shrink-0" />
 
           <div className="relative flex items-center flex-1 px-4 py-2 md:px-6 group">
-            <Money className="w-6 h-6 text-gray-900 mr-3 shrink-0" weight="regular" />
+            <Money className="w-6 h-6 text-black mr-3 shrink-0" weight="duotone" />
             <div className="flex flex-col flex-1 min-w-0">
               <span className="text-[15px] font-semibold text-gray-900 leading-tight">Budget</span>
               <select 
@@ -79,7 +79,7 @@ export default function HomeSearchForm() {
           <div className="h-8 w-px bg-gray-300 shrink-0" />
 
           <div className="relative flex items-center flex-1 px-4 py-2 md:px-6 group">
-            <GenderIntersex className="w-6 h-6 text-gray-900 mr-3 shrink-0" weight="regular" />
+            <GenderIntersex className="w-6 h-6 text-black mr-3 shrink-0" weight="duotone" />
             <div className="flex flex-col flex-1 min-w-0">
               <span className="text-[15px] font-semibold text-gray-900 leading-tight">Tipe Kos</span>
               <select 
@@ -103,7 +103,7 @@ export default function HomeSearchForm() {
             onClick={handleSearch}
             className="ml-4 w-[52px] h-[52px] bg-black text-white rounded-full hover:bg-gray-800 transition-colors flex items-center justify-center shrink-0"
           >
-            <MagnifyingGlass className="w-[22px] h-[22px] text-white" weight="duotone" />
+            <MagnifyingGlass className="w-[28px] h-[28px] text-white" weight="duotone" />
           </button>
         </div>
       </div>
@@ -114,7 +114,7 @@ export default function HomeSearchForm() {
         onClick={() => setIsMobileOpen(true)}
       >
         <div className="flex items-center">
-           <MapPin className="w-6 h-6 text-black mr-4 text-gray-900" weight="regular" />
+           <MapPin className="w-6 h-6 text-black mr-4" weight="duotone" />
            <div className="flex flex-col">
              <span className="text-[16px] font-semibold text-black leading-tight mb-1">{location !== "Lokasi" ? location : "Lokasi"}</span>
              <span className="text-[13px] text-[#888888] font-medium leading-tight">
@@ -136,7 +136,7 @@ export default function HomeSearchForm() {
             
             <div className="flex flex-col space-y-8 flex-1 mb-10">
               <div className="relative flex items-center">
-                <MapPin className="w-[26px] h-[26px] text-black mr-4" weight="regular" />
+                <MapPin className="w-[26px] h-[26px] text-black mr-4" weight="duotone" />
                 <select 
                   className="appearance-none w-full bg-transparent text-[18px] font-medium text-black focus:outline-none pr-6"
                   value={location}
@@ -156,7 +156,7 @@ export default function HomeSearchForm() {
               </div>
 
               <div className="relative flex items-center">
-                <Money className="w-[26px] h-[26px] text-black mr-4" weight="regular" />
+                <Money className="w-[26px] h-[26px] text-black mr-4" weight="duotone" />
                 <select 
                   className="appearance-none w-full bg-transparent text-[18px] font-medium text-black focus:outline-none pr-6"
                   value={price}
@@ -169,7 +169,7 @@ export default function HomeSearchForm() {
               </div>
 
               <div className="relative flex items-center">
-                <GenderIntersex className="w-[26px] h-[26px] text-black mr-4" weight="regular" />
+                <GenderIntersex className="w-[26px] h-[26px] text-black mr-4" weight="duotone" />
                 <select 
                   className="appearance-none w-full bg-transparent text-[18px] font-medium text-black focus:outline-none pr-6"
                   value={type}
