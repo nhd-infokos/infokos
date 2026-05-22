@@ -3,10 +3,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useRef, useMemo, useEffect } from "react";
-import { MapPin, CaretDown, CaretUp, CheckSquare, Square, MinusSquare, X } from "@phosphor-icons/react";
+import { MapPin, CaretDown, CheckSquare, Square, X, Train, Bus } from "@phosphor-icons/react";
 import type { Kos } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
 import { formatPrice } from "@/lib/utils";
+
+const CITY_IMAGES: Record<string, string> = {
+  "Jakarta Timur": "/img-filter-koslider/jakarta-timur.png",
+  "Jakarta Selatan": "/img-filter-koslider/jakarta-selatan.png",
+  "Jakarta Barat": "/img-filter-koslider/jakarta-barat.png",
+  "Jakarta Pusat": "/img-filter-koslider/jakarta-pusat.png",
+  "Jakarta Utara": "/img-filter-koslider/jakarta-utara.png",
+  "Bali": "/img-filter-koslider/bali.png",
+  "Depok": "/img-filter-koslider/depok.png",
+  "Bogor": "/img-filter-koslider/bogor.png",
+  "Tanggerang": "/img-filter-koslider/tanggerang.png",
+  "Surabaya": "/img-filter-koslider/surabaya.png",
+};
 
 const HARDCODED_LOCATIONS = [
   { city: "Jakarta Timur", districts: ["Cakung", "Cipayung", "Ciracas", "Duren Sawit", "Jatinegara", "Kramat Jati", "Makasar", "Matraman", "Pasar Rebo", "Pulo Gadung"] },
@@ -41,11 +54,15 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
 
   // Filter States
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [expandedCities, setExpandedCities] = useState<Set<string>>(new Set());
+  const [activeCityTab, setActiveCityTab] = useState<string>("Jakarta Selatan");
   
   // Format: Record<CityName, Set<DistrictName>>
   const [selectedLocs, setSelectedLocs] = useState<Record<string, Set<string>>>({});
   const [appliedLocs, setAppliedLocs] = useState<Record<string, Set<string>>>({});
+
+  // Transports State
+  const [selectedTransports, setSelectedTransports] = useState<Set<string>>(new Set());
+  const [appliedTransports, setAppliedTransports] = useState<Set<string>>(new Set());
 
   // Close filter on outside click
   useEffect(() => {
@@ -62,15 +79,36 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
 
   // Filter the kosList based on applied selections
   const filteredKosList = useMemo(() => {
-    const hasFilters = Object.keys(appliedLocs).length > 0;
-    if (!hasFilters) return kosList;
+    const hasLocFilters = Object.keys(appliedLocs).length > 0;
+    const hasTransFilters = appliedTransports.size > 0;
+    
+    if (!hasLocFilters && !hasTransFilters) return kosList;
 
     return kosList.filter(kos => {
-      if (!kos.city || !kos.district) return false;
-      const citySet = appliedLocs[kos.city];
-      return citySet && citySet.has(kos.district);
+      let locMatch = true;
+      if (hasLocFilters) {
+        if (!kos.city || !kos.district) locMatch = false;
+        else {
+          const citySet = appliedLocs[kos.city];
+          locMatch = !!(citySet && citySet.has(kos.district));
+        }
+      }
+
+      let transMatch = true;
+      if (hasTransFilters) {
+        const tStr = kos.nearby_transport?.toLowerCase() || "";
+        const tagsStr = kos.kos_tags?.map(t => t.name.toLowerCase()).join(" ") || "";
+        const combinedStr = `${tStr} ${tagsStr}`;
+
+        transMatch = false; // Need at least one match if filters are active
+        if (appliedTransports.has("MRT") && combinedStr.includes("mrt")) transMatch = true;
+        if (appliedTransports.has("KRL") && combinedStr.includes("krl")) transMatch = true;
+        if (appliedTransports.has("TJ") && (combinedStr.includes("busway") || combinedStr.includes("transjakarta") || combinedStr.includes("tj"))) transMatch = true;
+      }
+
+      return locMatch && transMatch;
     });
-  }, [kosList, appliedLocs]);
+  }, [kosList, appliedLocs, appliedTransports]);
 
   const scrollSlider = (direction: 'left' | 'right') => {
     if (sliderRef.current) {
@@ -80,24 +118,6 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
         behavior: 'smooth'
       });
     }
-  };
-
-  const toggleCityExpand = (city: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newExpanded = new Set(expandedCities);
-    if (newExpanded.has(city)) newExpanded.delete(city);
-    else newExpanded.add(city);
-    setExpandedCities(newExpanded);
-  };
-
-  const toggleCitySelection = (city: string, allDistricts: string[]) => {
-    const newSelected = { ...selectedLocs };
-    if (newSelected[city]?.size === allDistricts.length) {
-      delete newSelected[city];
-    } else {
-      newSelected[city] = new Set(allDistricts);
-    }
-    setSelectedLocs(newSelected);
   };
 
   const toggleDistrictSelection = (city: string, district: string) => {
@@ -113,49 +133,87 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
     setSelectedLocs(newSelected);
   };
 
-  const getCityState = (city: string, totalDistricts: number) => {
-    const selectedCount = selectedLocs[city]?.size || 0;
-    if (selectedCount === 0) return 'unchecked';
-    if (selectedCount === totalDistricts) return 'checked';
-    return 'indeterminate';
+  const toggleTransportSelection = (transport: string) => {
+    const newSelected = new Set(selectedTransports);
+    if (newSelected.has(transport)) newSelected.delete(transport);
+    else newSelected.add(transport);
+    setSelectedTransports(newSelected);
   };
-
-  const hasAnySelection = Object.keys(selectedLocs).length > 0;
 
   const handleApply = () => {
     setAppliedLocs(selectedLocs);
+    setAppliedTransports(selectedTransports);
     setIsFilterOpen(false);
   };
 
   const handleReset = () => {
     setSelectedLocs({});
     setAppliedLocs({});
+    setSelectedTransports(new Set());
+    setAppliedTransports(new Set());
   };
 
   const getFilterLabel = () => {
     const cities = Object.keys(appliedLocs);
-    if (cities.length === 0) return "Pilih Lokasi";
+    const transCount = appliedTransports.size;
+
+    if (cities.length === 0) {
+      if (transCount > 0) return `${transCount} Transportasi`;
+      return "Pilih Lokasi";
+    }
 
     let totalDistricts = 0;
     cities.forEach(c => totalDistricts += appliedLocs[c].size);
 
+    let baseLabel = "";
     if (cities.length === 1) {
       const city = cities[0];
       const districtsArray = Array.from(appliedLocs[city]);
       if (districtsArray.length === 1) {
-        return districtsArray[0];
+        baseLabel = districtsArray[0];
       } else {
-        return `${districtsArray.length} lokasi di ${city}`;
+        baseLabel = `${districtsArray.length} lokasi di ${city}`;
       }
     } else {
-      return `${totalDistricts} lokasi terpilih`;
+      baseLabel = `${totalDistricts} lokasi terpilih`;
     }
+
+    if (transCount > 0) return `${baseLabel} + ${transCount} Trp`;
+    return baseLabel;
   };
 
-  const renderCheckboxIcon = (state: 'unchecked' | 'checked' | 'indeterminate') => {
-    if (state === 'checked') return <CheckSquare className="w-[22px] h-[22px] text-black" weight="fill" />;
-    if (state === 'indeterminate') return <MinusSquare className="w-[22px] h-[22px] text-black" weight="fill" />;
-    return <Square className="w-[22px] h-[22px] text-black" weight="regular" />;
+  // Drag to Scroll logic for Cities
+  const citiesScrollRef = useRef<HTMLDivElement>(null);
+  const [isDraggingCities, setIsDraggingCities] = useState(false);
+  const [dragMoved, setDragMoved] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!citiesScrollRef.current) return;
+    setIsDraggingCities(true);
+    setDragMoved(false);
+    setStartX(e.pageX - citiesScrollRef.current.offsetLeft);
+    setScrollLeftPos(citiesScrollRef.current.scrollLeft);
+  };
+
+  const handleMouseLeaveOrUp = () => {
+    setIsDraggingCities(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingCities || !citiesScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - citiesScrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // scroll-fast multiplier
+    if (Math.abs(walk) > 10) setDragMoved(true);
+    citiesScrollRef.current.scrollLeft = scrollLeftPos - walk;
+  };
+
+  const handleCityClick = (city: string) => {
+    if (!dragMoved) {
+      setActiveCityTab(city);
+    }
   };
 
   return (
@@ -227,7 +285,7 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
             >
               <MapPin className="w-5 h-5 shrink-0" weight="regular" />
               <span className="font-medium text-[16px] max-w-[200px] truncate">{getFilterLabel()}</span>
-              {Object.keys(appliedLocs).length > 0 ? (
+              {(Object.keys(appliedLocs).length > 0 || appliedTransports.size > 0) ? (
                 <div onClick={(e) => { e.stopPropagation(); handleReset(); }} className="p-1 hover:bg-gray-100 rounded-full cursor-pointer ml-1">
                    <X className="w-4 h-4 text-gray-500" weight="bold" />
                 </div>
@@ -237,57 +295,99 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
             </button>
 
             {isFilterOpen && (
-              <div className="absolute top-full left-0 mt-3 w-[280px] bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col">
-                <div className="max-h-[320px] overflow-y-auto p-2 scrollbar-hide">
-                  {locations.length > 0 ? locations.map((loc) => {
-                    const isExpanded = expandedCities.has(loc.city);
-                    const cityState = getCityState(loc.city, loc.districts.length);
-
+              <div className="absolute top-full left-0 mt-3 w-[85vw] max-w-[540px] bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-5 pb-6">
+                
+                {/* Cities Horizontal Scroll */}
+                <div 
+                  ref={citiesScrollRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseLeave={handleMouseLeaveOrUp}
+                  onMouseUp={handleMouseLeaveOrUp}
+                  onMouseMove={handleMouseMove}
+                  className={`flex overflow-x-auto gap-4 pb-4 select-none ${isDraggingCities ? 'cursor-grabbing' : 'cursor-grab'} [&::-webkit-scrollbar]:hidden`} 
+                  style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+                >
+                  {locations.map((loc) => {
+                    const isActive = activeCityTab === loc.city;
                     return (
-                      <div key={loc.city} className="mb-1">
-                        {/* City Row */}
-                        <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={(e) => toggleCityExpand(loc.city, e)}>
-                          <div className="flex items-center gap-3">
-                            <div onClick={(e) => { e.stopPropagation(); toggleCitySelection(loc.city, loc.districts); }}>
-                              {renderCheckboxIcon(cityState)}
-                            </div>
-                            <span className="text-[15px] font-medium text-[#111111]">{loc.city}</span>
+                      <div 
+                        key={loc.city} 
+                        className="cursor-pointer snap-start flex flex-col items-center shrink-0 w-[96px]"
+                        onClick={() => handleCityClick(loc.city)}
+                      >
+                        <div className={`w-[96px] h-[64px] rounded-[16px] p-1 mb-2 transition-all border-2 ${isActive ? 'border-black bg-white' : 'border-transparent'}`}>
+                          <div className="relative w-full h-full rounded-[10px] overflow-hidden">
+                            <Image src={CITY_IMAGES[loc.city] || CITY_IMAGES["Jakarta Selatan"]} alt={loc.city} fill className="object-cover" />
                           </div>
-                          {isExpanded ? <CaretUp className="w-4 h-4 text-gray-500" /> : <CaretDown className="w-4 h-4 text-gray-500" />}
                         </div>
-
-                        {/* Districts list */}
-                        {isExpanded && (
-                          <div className="ml-[34px] mt-1 space-y-1 mb-2">
-                            {loc.districts.map(district => {
-                              const isDistrictSelected = selectedLocs[loc.city]?.has(district);
-                              return (
-                                <div key={district} className="flex items-center gap-3 px-3 py-1.5 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => toggleDistrictSelection(loc.city, district)}>
-                                  {renderCheckboxIcon(isDistrictSelected ? 'checked' : 'unchecked')}
-                                  <span className="text-[14px] text-gray-600">{district}</span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                        <span className={`text-[13px] text-center leading-tight ${isActive ? 'font-semibold text-black' : 'text-gray-500'}`}>{loc.city}</span>
                       </div>
                     );
-                  }) : (
-                    <div className="p-4 text-center text-sm text-gray-500">Tidak ada lokasi</div>
-                  )}
+                  })}
+                </div>
+
+                <div className="w-full h-px bg-gray-100 my-2" />
+
+                {/* Districts 2-Row Grid Horizontal Scroll */}
+                <div className="overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+                  <div className="grid grid-rows-2 auto-cols-max gap-x-8 gap-y-4 mt-3">
+                    {locations.find(l => l.city === activeCityTab)?.districts?.map(district => {
+                      const isSelected = selectedLocs[activeCityTab]?.has(district);
+                      return (
+                        <div 
+                          key={district} 
+                          className="flex items-center gap-2 cursor-pointer group pr-4"
+                          onClick={(e) => { e.stopPropagation(); toggleDistrictSelection(activeCityTab, district); }}
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="w-[20px] h-[20px] text-black" weight="fill" />
+                          ) : (
+                            <Square className="w-[20px] h-[20px] text-gray-300 group-hover:text-gray-400" weight="regular" />
+                          )}
+                          <span className="text-[14px] text-gray-700 whitespace-nowrap">{district}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="w-full h-px bg-gray-100 my-2" />
+
+                {/* Transports */}
+                <div className="flex flex-wrap gap-3 mt-3">
+                  <button 
+                    onClick={() => toggleTransportSelection("MRT")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${selectedTransports.has("MRT") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
+                  >
+                    <Train className="w-[18px] h-[18px]" />
+                    <span className="text-[14px] font-medium">Dekat MRT</span>
+                  </button>
+                  <button 
+                    onClick={() => toggleTransportSelection("KRL")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${selectedTransports.has("KRL") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
+                  >
+                    <Train className="w-[18px] h-[18px]" />
+                    <span className="text-[14px] font-medium">Dekat KRL</span>
+                  </button>
+                  <button 
+                    onClick={() => toggleTransportSelection("TJ")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${selectedTransports.has("TJ") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
+                  >
+                    <Bus className="w-[18px] h-[18px]" />
+                    <span className="text-[14px] font-medium">TJ</span>
+                  </button>
                 </div>
 
                 {/* Apply Button */}
-                {hasAnySelection && (
-                  <div className="p-4 border-t border-gray-100 bg-white">
-                    <button 
-                      onClick={handleApply}
-                      className="w-full bg-black text-white font-semibold py-3 rounded-xl hover:bg-black/90 transition-colors text-[15px]"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                )}
+                <div className="mt-8">
+                  <button 
+                    onClick={handleApply}
+                    className="w-full bg-black text-white font-semibold py-3.5 rounded-[16px] hover:bg-black/90 transition-colors text-[15px]"
+                  >
+                    Apply
+                  </button>
+                </div>
+
               </div>
             )}
           </div>
