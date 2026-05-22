@@ -4,6 +4,7 @@ import {
   MapPin, Buildings, GenderIntersex, Money
 } from "@phosphor-icons/react/dist/ssr";
 import KosSlider from "@/components/KosSlider";
+import KontrakanSlider from "@/components/KontrakanSlider";
 import HomeSearchForm from "@/components/HomeSearchForm";
 import { getKosList } from "@/services/kos.service";
 import { getActiveBanner } from "@/services/banner.service";
@@ -96,6 +97,10 @@ export default async function Home() {
 
         <section className="w-full mt-24 mb-10">
           <KosSlider kosList={kosList} />
+        </section>
+
+        <section className="w-full mt-24 mb-10">
+          <KontrakanSlider kosList={kosList} />
         </section>
 
         {/* Call to Action Section */}

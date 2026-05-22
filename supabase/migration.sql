@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS kos (
   latitude DOUBLE PRECISION,
   longitude DOUBLE PRECISION,
   price INTEGER NOT NULL,  
-  kos_type TEXT CHECK (kos_type IN ('putra', 'putri', 'campur')),
+  kos_type TEXT CHECK (kos_type IN ('putra', 'putri', 'campur', 'kontrakan')),
   gender_label TEXT,
   target_tenant TEXT,
   nearby_transport TEXT,
