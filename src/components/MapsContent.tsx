@@ -88,6 +88,10 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
       latitude: k.latitude!,
       longitude: k.longitude!,
       price: k.price,
+      image_url: k.image_url,
+      district: k.district,
+      city: k.city,
+      kos_type: k.kos_type,
     }));
 
   // Determine map center based on selected location
@@ -164,7 +168,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
         {/* Left Column — Kos Card List */}
         <div className="w-full lg:w-1/2 max-h-[700px] overflow-y-auto pr-2 scrollbar-thin">
           {filteredKosList.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
               {filteredKosList.map((kos) => (
                 <Link key={kos.id} href={`/detail/${kos.slug}`} className="group cursor-pointer block">
                   <div className="relative w-full aspect-square rounded-[24px] overflow-hidden mb-5 bg-gray-100">
@@ -177,9 +181,12 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
                       <span>{kos.district}, {kos.city}</span>
                     </div>
                     <KosTags kos={kos} />
-                    <div className="text-right mt-5">
-                      <span className="font-medium text-[#E53E3E] text-[20px]">{formatPrice(kos.price)}</span>
-                      <span className="font-medium text-[#111111] text-[20px]">/monthly</span>
+                    <div className="flex justify-between items-center mt-5">
+                      <span className="text-[#888888] text-[15px]">Start from</span>
+                      <div>
+                        <span className="font-medium text-[#E53E3E] text-[20px]">{formatPrice(kos.price)}</span>
+                        <span className="font-medium text-[#111111] text-[20px]">/monthly</span>
+                      </div>
                     </div>
                   </div>
                 </Link>
