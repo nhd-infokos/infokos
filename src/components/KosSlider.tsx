@@ -61,7 +61,6 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
   const [appliedLocs, setAppliedLocs] = useState<Record<string, Set<string>>>({});
 
   // Transports State
-  const [selectedTransports, setSelectedTransports] = useState<Set<string>>(new Set());
   const [appliedTransports, setAppliedTransports] = useState<Set<string>>(new Set());
 
   // Close filter on outside click
@@ -134,31 +133,26 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
   };
 
   const toggleTransportSelection = (transport: string) => {
-    const newSelected = new Set(selectedTransports);
+    const newSelected = new Set(appliedTransports);
     if (newSelected.has(transport)) newSelected.delete(transport);
     else newSelected.add(transport);
-    setSelectedTransports(newSelected);
+    setAppliedTransports(newSelected);
   };
 
   const handleApply = () => {
     setAppliedLocs(selectedLocs);
-    setAppliedTransports(selectedTransports);
     setIsFilterOpen(false);
   };
 
   const handleReset = () => {
     setSelectedLocs({});
     setAppliedLocs({});
-    setSelectedTransports(new Set());
-    setAppliedTransports(new Set());
   };
 
   const getFilterLabel = () => {
     const cities = Object.keys(appliedLocs);
-    const transCount = appliedTransports.size;
 
     if (cities.length === 0) {
-      if (transCount > 0) return `${transCount} Transportasi`;
       return "Pilih Lokasi";
     }
 
@@ -178,7 +172,6 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
       baseLabel = `${totalDistricts} lokasi terpilih`;
     }
 
-    if (transCount > 0) return `${baseLabel} + ${transCount} Trp`;
     return baseLabel;
   };
 
@@ -276,16 +269,17 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
       {/* Right Cards Slider */}
       <div className="w-full lg:flex-1 min-w-0">
         
-        {/* Filter Dropdown */}
-        <div className="flex justify-start lg:justify-start items-center mb-6 pr-[50px] relative z-20" ref={filterRef}>
-          <div className="relative">
+        {/* Filters Container */}
+        <div className="flex flex-wrap gap-6 items-center mb-6 pr-[50px] relative z-20">
+          {/* Location Dropdown */}
+          <div className="relative" ref={filterRef}>
             <button 
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center gap-2 text-[#111111] hover:opacity-80 transition-opacity"
             >
               <MapPin className="w-5 h-5 shrink-0" weight="regular" />
               <span className="font-medium text-[16px] max-w-[200px] truncate">{getFilterLabel()}</span>
-              {(Object.keys(appliedLocs).length > 0 || appliedTransports.size > 0) ? (
+              {(Object.keys(appliedLocs).length > 0) ? (
                 <div onClick={(e) => { e.stopPropagation(); handleReset(); }} className="p-1 hover:bg-gray-100 rounded-full cursor-pointer ml-1">
                    <X className="w-4 h-4 text-gray-500" weight="bold" />
                 </div>
@@ -351,33 +345,6 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
                   </div>
                 </div>
 
-                <div className="w-full h-px bg-gray-100 my-2" />
-
-                {/* Transports */}
-                <div className="flex flex-wrap gap-3 mt-3">
-                  <button 
-                    onClick={() => toggleTransportSelection("MRT")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${selectedTransports.has("MRT") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
-                  >
-                    <Train className="w-[18px] h-[18px]" />
-                    <span className="text-[14px] font-medium">Dekat MRT</span>
-                  </button>
-                  <button 
-                    onClick={() => toggleTransportSelection("KRL")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${selectedTransports.has("KRL") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
-                  >
-                    <Train className="w-[18px] h-[18px]" />
-                    <span className="text-[14px] font-medium">Dekat KRL</span>
-                  </button>
-                  <button 
-                    onClick={() => toggleTransportSelection("TJ")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${selectedTransports.has("TJ") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
-                  >
-                    <Bus className="w-[18px] h-[18px]" />
-                    <span className="text-[14px] font-medium">TJ</span>
-                  </button>
-                </div>
-
                 {/* Apply Button */}
                 <div className="mt-8">
                   <button 
@@ -390,6 +357,31 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
 
               </div>
             )}
+          </div>
+
+          {/* Transports */}
+          <div className="flex flex-wrap gap-3">
+            <button 
+              onClick={() => toggleTransportSelection("MRT")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${appliedTransports.has("MRT") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
+            >
+              <Train className="w-[18px] h-[18px]" />
+              <span className="text-[14px] font-medium">Dekat MRT</span>
+            </button>
+            <button 
+              onClick={() => toggleTransportSelection("KRL")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${appliedTransports.has("KRL") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
+            >
+              <Train className="w-[18px] h-[18px]" />
+              <span className="text-[14px] font-medium">Dekat KRL</span>
+            </button>
+            <button 
+              onClick={() => toggleTransportSelection("TJ")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${appliedTransports.has("TJ") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
+            >
+              <Bus className="w-[18px] h-[18px]" />
+              <span className="text-[14px] font-medium">TJ</span>
+            </button>
           </div>
         </div>
 
