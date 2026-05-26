@@ -55,7 +55,7 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
   // Filter States
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeCityTab, setActiveCityTab] = useState<string>("Jakarta Selatan");
-  
+
   // Format: Record<CityName, Set<DistrictName>>
   const [selectedLocs, setSelectedLocs] = useState<Record<string, Set<string>>>({});
   const [appliedLocs, setAppliedLocs] = useState<Record<string, Set<string>>>({});
@@ -80,7 +80,7 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
   const filteredKosList = useMemo(() => {
     const hasLocFilters = Object.keys(appliedLocs).length > 0;
     const hasTransFilters = appliedTransports.size > 0;
-    
+
     if (!hasLocFilters && !hasTransFilters) return kosList;
 
     return kosList.filter(kos => {
@@ -122,7 +122,7 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
   const toggleDistrictSelection = (city: string, district: string) => {
     const newSelected = { ...selectedLocs };
     if (!newSelected[city]) newSelected[city] = new Set();
-    
+
     if (newSelected[city].has(district)) {
       newSelected[city].delete(district);
       if (newSelected[city].size === 0) delete newSelected[city];
@@ -153,7 +153,7 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
     const cities = Object.keys(appliedLocs);
 
     if (cities.length === 0) {
-      return "Pilih Lokasi";
+      return "Cari Area Mana?";
     }
 
     let totalDistricts = 0;
@@ -214,13 +214,12 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
       {/* Left Text */}
       <div className="w-full lg:w-[20%] shrink-0 pr-4 lg:pr-8">
         <h2 className="text-3xl md:text-4xl lg:text-[42px] font-bold leading-[1.2] text-[#111111] mb-6 tracking-tight">
-          Kost &<br />
-          Coliving<br />
-          Picked For<br />
-          You
+          Nahdia Pilihan Kost,<br />
+          Untuk Mobilitas<br />
+          Sat-Set
         </h2>
         <p className="text-[#888888] text-[14px] lg:text-[15px] leading-relaxed mb-10 max-w-[240px] md:max-w-[280px]">
-          pekerja produktif Jakarta menghabiskan energi ekstra bukan karena jobdesc-nya berat, tapi karena environment sehari-harinya nggak supportif — mulai dari tempat tinggal sampai fasilitas yang tanggung
+          Biar ngantor tinggal ngesot! Di Nahdia Infokost, kamu bebas pilih sewa kost eksklusif dan coliving strategis, jadi segampang itu. Lokasinya strategis, akses transportasi gampang, plus kamarnya udah estetik siap huni. mobilitasmu auto sat-set
         </p>
         <div className="flex items-center -ml-4 gap-2">
           <button onClick={() => scrollSlider('left')} className="hover:opacity-80 transition-opacity outline-none" aria-label="Previous">
@@ -268,12 +267,12 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
 
       {/* Right Cards Slider */}
       <div className="w-full lg:flex-1 min-w-0">
-        
+
         {/* Filters Container */}
         <div className="flex flex-wrap gap-6 items-center mb-6 pr-[50px] relative z-20">
           {/* Location Dropdown */}
           <div className="relative" ref={filterRef}>
-            <button 
+            <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center gap-2 text-[#111111] hover:opacity-80 transition-opacity"
             >
@@ -281,7 +280,7 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
               <span className="font-medium text-[16px] max-w-[200px] truncate">{getFilterLabel()}</span>
               {(Object.keys(appliedLocs).length > 0) ? (
                 <div onClick={(e) => { e.stopPropagation(); handleReset(); }} className="p-1 hover:bg-gray-100 rounded-full cursor-pointer ml-1">
-                   <X className="w-4 h-4 text-gray-500" weight="bold" />
+                  <X className="w-4 h-4 text-gray-500" weight="bold" />
                 </div>
               ) : (
                 <CaretDown className={`w-4 h-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} weight="bold" />
@@ -290,22 +289,22 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
 
             {isFilterOpen && (
               <div className="absolute top-full left-0 mt-3 w-[85vw] max-w-[540px] bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 overflow-hidden flex flex-col p-5 pb-6">
-                
+
                 {/* Cities Horizontal Scroll */}
-                <div 
+                <div
                   ref={citiesScrollRef}
                   onMouseDown={handleMouseDown}
                   onMouseLeave={handleMouseLeaveOrUp}
                   onMouseUp={handleMouseLeaveOrUp}
                   onMouseMove={handleMouseMove}
-                  className={`flex overflow-x-auto gap-4 pb-4 select-none ${isDraggingCities ? 'cursor-grabbing' : 'cursor-grab'} [&::-webkit-scrollbar]:hidden`} 
+                  className={`flex overflow-x-auto gap-4 pb-4 select-none ${isDraggingCities ? 'cursor-grabbing' : 'cursor-grab'} [&::-webkit-scrollbar]:hidden`}
                   style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
                 >
                   {locations.map((loc) => {
                     const isActive = activeCityTab === loc.city;
                     return (
-                      <div 
-                        key={loc.city} 
+                      <div
+                        key={loc.city}
                         className="cursor-pointer snap-start flex flex-col items-center shrink-0 w-[96px]"
                         onClick={() => handleCityClick(loc.city)}
                       >
@@ -328,8 +327,8 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
                     {locations.find(l => l.city === activeCityTab)?.districts?.map(district => {
                       const isSelected = selectedLocs[activeCityTab]?.has(district);
                       return (
-                        <div 
-                          key={district} 
+                        <div
+                          key={district}
                           className="flex items-center gap-2 cursor-pointer group pr-4"
                           onClick={(e) => { e.stopPropagation(); toggleDistrictSelection(activeCityTab, district); }}
                         >
@@ -347,7 +346,7 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
 
                 {/* Apply Button */}
                 <div className="mt-8">
-                  <button 
+                  <button
                     onClick={handleApply}
                     className="w-full bg-black text-white font-semibold py-3.5 rounded-[16px] hover:bg-black/90 transition-colors text-[15px]"
                   >
@@ -361,21 +360,21 @@ export default function KosSlider({ kosList }: { kosList: Kos[] }) {
 
           {/* Transports */}
           <div className="flex flex-wrap gap-3">
-            <button 
+            <button
               onClick={() => toggleTransportSelection("MRT")}
               className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${appliedTransports.has("MRT") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
             >
               <Train className="w-[18px] h-[18px]" />
               <span className="text-[14px] font-medium">Dekat MRT</span>
             </button>
-            <button 
+            <button
               onClick={() => toggleTransportSelection("KRL")}
               className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${appliedTransports.has("KRL") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
             >
               <Train className="w-[18px] h-[18px]" />
               <span className="text-[14px] font-medium">Dekat KRL</span>
             </button>
-            <button 
+            <button
               onClick={() => toggleTransportSelection("TJ")}
               className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${appliedTransports.has("TJ") ? 'bg-gray-100 border-black text-black' : 'bg-white border-gray-200 text-[#111111] hover:bg-gray-50'}`}
             >

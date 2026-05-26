@@ -12,8 +12,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Cari Kos Modern - Carikos",
-  description: "Cari kos modern yang tenang, nyaman, dan siap jadi tempat pulang terbaikmu setiap hari.",
+  title: "Nahdia Infokost | Tempat Tinggal Paling Strategis Biar Mobilitasmu Tetap Sat-Set & Enjoy",
+  description: "Capek tua di jalan? Waktunya pindah ke hunian idaman yang se-strategis itu yang bikin mobilitas harianmu makin enjoy. Cari kos & sewa rumah praktis dekat kantor atau kampus cuma di Nahdia Infokost. Yuk, temukan kamar nyamanmu sekarang!",
+  keywords: "cari kos, info kost, kost strategis, kost dekat kampus, kost dekat mrt, kost dekat tj, kost dekat krl, kost dekat kantor, sewa rumah, kontrakan murah, kost nyaman, kost putra, kost putri, kost campur, coliving",
   icons: {
     icon: "/img-webp/favicon-nhd.png",
   },

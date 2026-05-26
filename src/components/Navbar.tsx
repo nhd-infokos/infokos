@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Buildings, X } from "@phosphor-icons/react";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { Buildings, X, User, SignOut } from "@phosphor-icons/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -14,6 +15,43 @@ export default function Navbar() {
   const isWhyNahdiaActive = pathname === "/why-nahdia";
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const supabase = createSupabaseBrowserClient();
+  const router = useRouter();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsDropdownOpen(false);
+    router.refresh();
+  };
+
+  const userName = user?.email || "Member";
 
   return (
     <nav className="relative z-50 flex items-center justify-between px-6 md:px-[50px] py-6 w-full">
@@ -53,12 +91,36 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex items-center justify-end flex-1 hidden sm:flex">
-        <Link
-          href="/login"
-          className="px-6 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors"
-        >
-          Login
-        </Link>
+        {user ? (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 px-6 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors"
+            >
+              <User size={18} weight="regular" />
+              <span>{userName}</span>
+            </button>
+            
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] py-2 border border-gray-100 overflow-hidden">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full gap-3 px-5 py-3 text-[15px] text-black hover:bg-gray-50 transition-colors text-left"
+                >
+                  <SignOut size={20} weight="regular" />
+                  <span>Keluar</span>
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="px-6 py-2.5 bg-black text-white text-[15px] font-medium rounded-full hover:bg-gray-800 transition-colors"
+          >
+            Login
+          </Link>
+        )}
       </div>
 
       <div className="flex items-center sm:hidden">
@@ -100,13 +162,32 @@ export default function Navbar() {
             >
               Why Nahdia
             </Link>
-            <Link
-              href="/login"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-[20px] pb-4 border-b border-gray-100 font-medium text-gray-500"
-            >
-              Login
-            </Link>
+            {user ? (
+              <>
+                <div className="text-[20px] pb-4 border-b border-gray-100 font-bold text-black flex items-center gap-2">
+                  <User size={24} weight="regular" />
+                  <span>{userName}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 text-[20px] pb-4 border-b border-gray-100 font-medium text-red-500 text-left"
+                >
+                  <SignOut size={24} weight="regular" />
+                  <span>Keluar</span>
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-[20px] pb-4 border-b border-gray-100 font-medium text-gray-500"
+              >
+                Login
+              </Link>
+            )}
           </div>
           <div className="mt-10">
             <Link

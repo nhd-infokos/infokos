@@ -1,10 +1,40 @@
 "use client";
 
-import { EnvelopeSimple, Lock, Buildings } from "@phosphor-icons/react";
+import { EnvelopeSimple, Lock } from "@phosphor-icons/react";
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 export default function LoginForm({ backgroundImages }: { backgroundImages: string[] }) {
+  const router = useRouter();
+  const supabase = createSupabaseBrowserClient();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    router.push("/");
+    router.refresh();
+  };
+
   // We'll create columns for the animated background. 
   // To make it infinite, we duplicate the images in each column.
   const columnCount = 5;
@@ -58,17 +88,17 @@ export default function LoginForm({ backgroundImages }: { backgroundImages: stri
         <div className="w-full max-w-[460px] mx-auto">
           
           {/* Logo & Brand */}
-          <div className="flex items-center gap-3 mb-12">
+          <Link href="/" className="inline-flex items-center gap-3 mb-12 hover:opacity-90 transition-opacity">
             <Image src="/nhdlogo.svg" alt="NHD Logo" width={50} height={39} priority className="w-auto h-10 cursor-pointer" />
             <span className="text-[28px] font-bold tracking-tight text-[#111111]" style={{ fontFamily: "var(--font-poppins)" }}>Nahdia Infokost</span>
-          </div>
+          </Link>
 
           <h1 className="text-[32px] font-bold text-[#111111] mb-3 tracking-tight">Log in</h1>
           <p className="text-[#666666] text-[15px] mb-10 leading-relaxed">
             Belum punya akun? <Link href="/langganan" className="text-[#111111] underline font-semibold hover:opacity-80 transition-opacity">Berlangganan dulu</Link> untuk mendapatkan akses penuh ke semua detail hunian.
           </p>
 
-          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-6" onSubmit={handleLogin}>
             
             {/* Email Field */}
             <div className="space-y-2">
@@ -79,6 +109,9 @@ export default function LoginForm({ backgroundImages }: { backgroundImages: stri
                 </div>
                 <input 
                   type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                   className="w-full pl-[52px] pr-5 py-3.5 bg-transparent border border-[#CCCCCC] rounded-full text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
                   placeholder="designer@example.com"
                 />
@@ -94,19 +127,27 @@ export default function LoginForm({ backgroundImages }: { backgroundImages: stri
                 </div>
                 <input 
                   type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                   className="w-full pl-[52px] pr-5 py-3.5 bg-transparent border border-[#CCCCCC] rounded-full text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
                   placeholder="password"
                 />
               </div>
             </div>
 
+            {error && (
+              <p className="text-sm text-red-500 bg-red-50 p-3 rounded-lg border border-red-100">{error}</p>
+            )}
+
             {/* Submit Button */}
             <div className="pt-4">
               <button 
                 type="submit" 
-                className="w-full bg-black hover:bg-black/90 text-white font-semibold py-4 rounded-full transition-colors text-[16px]"
+                disabled={loading}
+                className="w-full bg-black hover:bg-black/90 text-white font-semibold py-4 rounded-full transition-colors text-[16px] disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Log in
+                {loading ? "Memproses..." : "Log in"}
               </button>
             </div>
           </form>

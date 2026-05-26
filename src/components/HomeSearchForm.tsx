@@ -30,7 +30,7 @@ export default function HomeSearchForm() {
   return (
     <>
       <div className="hidden md:flex flex-col bg-white rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-6 md:p-8 w-full">
-        <h2 className="text-[20px] font-medium text-gray-900 mb-6 pl-2">Hai, mau cari kos di mana?</h2>
+        <h2 className="text-[20px] font-medium text-gray-900 mb-6 pl-2">Cari Kost & Rumah Sewa Strategis, Biar Mobilitasmu Makin Sat-Set</h2>
         <div className="flex items-center w-full">
           <div className="relative flex items-center flex-1 px-4 py-2 md:px-6 group">
             <MapPin className="w-6 h-6 text-black mr-3 shrink-0" weight="duotone" />
@@ -81,13 +81,13 @@ export default function HomeSearchForm() {
           <div className="relative flex items-center flex-1 px-4 py-2 md:px-6 group">
             <GenderIntersex className="w-6 h-6 text-black mr-3 shrink-0" weight="duotone" />
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-[15px] font-semibold text-gray-900 leading-tight">Tipe Kos</span>
+              <span className="text-[15px] font-semibold text-gray-900 leading-tight">Pilih Properti</span>
               <select
                 className="appearance-none w-full bg-transparent text-[14px] text-gray-500 focus:outline-none cursor-pointer pr-6 mt-0.5 truncate"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               >
-                <option value="Tipe Kos">pilih tipe kos</option>
+                <option value="Tipe Kos">pilih tipe properti</option>
                 <option value="Putra">Putra</option>
                 <option value="Putri">Putri</option>
                 <option value="Campur">Campur</option>

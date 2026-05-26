@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { KosRoom } from "@/types/kos";
 import { getKosBySlug } from "@/services/kos.service";
 import { getRoomsByKosId } from "@/services/room.service";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import RoomMarkers from "@/components/RoomMarkers";
 import Navbar from "@/components/Navbar";
 import KosInfoCard from "@/components/KosInfoCard";
@@ -12,6 +14,14 @@ export const revalidate = 300;
 
 export default async function DetailKos({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+
+  // Validasi: harus login untuk mengakses halaman detail
+  const supabase = await createSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    redirect("/langganan");
+  }
 
   let kos = null;
   let rooms: KosRoom[] = [];

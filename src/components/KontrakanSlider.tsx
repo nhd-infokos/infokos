@@ -47,60 +47,60 @@ export default function KontrakanSlider({ kosList }: { kosList: Kos[] }) {
 
   return (
     <div className="flex flex-col lg:flex-row-reverse gap-8 lg:gap-12 items-start w-[calc(100%+50px)] -mr-[50px] lg:-mr-0 lg:-ml-[50px]">
-      
+
       {/* Right Text */}
       <div className="w-full lg:w-[20%] shrink-0 pr-4 lg:pr-[50px] lg:pl-8 flex flex-col lg:justify-start">
         <div>
           <h2 className="text-3xl md:text-4xl lg:text-[42px] font-bold leading-[1.2] text-[#111111] mb-6 tracking-tight">
-            Kontrakan<br />
-            Nyaman untuk<br />
-            Tinggal
+            Nahdia, Your Comfy<br />
+            Private Space
+
           </h2>
           <p className="text-[#888888] text-[14px] lg:text-[15px] leading-relaxed mb-10 max-w-[240px] md:max-w-[280px]">
-            Bukan cuma tempat singgah, tapi tempat pulang yang bikin lebih tenang.
+            Say goodbye sama hunian yang sempit dan berisik! Saatnya pindah ke living space idaman di  JKT & sekitarnya. Temukan rent house estetik  yang beneran ngasih kamu privasi total ! Bebas bising, Ngasih kamu space luasan buat bebas berekspresi dan yang paling penting harganya beneran worth it di kantong. Your rules, your comfy zone!
           </p>
           <div className="flex items-center -ml-4 gap-2">
-          <button onClick={() => scrollSlider('left')} className="hover:opacity-80 transition-opacity outline-none" aria-label="Previous">
-            <svg width="64" height="64" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g filter="url(#filter0_d_248_692)">
-                <rect x="64" y="60" width="44" height="44" rx="22" transform="rotate(-180 64 60)" fill="white" shapeRendering="crispEdges" />
-                <path d="M36.1309 37.3809L44.8809 28.6309C44.9622 28.5496 45.0588 28.4852 45.165 28.4412C45.2712 28.3972 45.385 28.3745 45.5 28.3745C45.615 28.3745 45.7288 28.3972 45.835 28.4412C45.9413 28.4852 46.0378 28.5496 46.1191 28.6309C46.2004 28.7122 46.2649 28.8087 46.3088 28.915C46.3528 29.0212 46.3755 29.135 46.3755 29.25C46.3755 29.365 46.3528 29.4788 46.3088 29.585C46.2649 29.6913 46.2004 29.7878 46.1191 29.8691L37.987 38L46.1191 46.1309C46.2833 46.2951 46.3755 46.5178 46.3755 46.75C46.3755 46.9822 46.2833 47.2049 46.1191 47.3691C45.9549 47.5332 45.7322 47.6255 45.5 47.6255C45.2678 47.6255 45.0451 47.5332 44.8809 47.3691L36.1309 38.6191C36.0496 38.5378 35.985 38.4413 35.941 38.3351C35.897 38.2289 35.8743 38.115 35.8743 38C35.8743 37.885 35.897 37.7712 35.941 37.6649C35.985 37.5587 36.0496 37.4622 36.1309 37.3809Z" fill="black" />
-              </g>
-              <defs>
-                <filter id="filter0_d_248_692" x="0" y="0" width="84" height="84" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                  <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                  <feOffset dy="4" />
-                  <feGaussianBlur stdDeviation="10" />
-                  <feComposite in2="hardAlpha" operator="out" />
-                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
-                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_248_692" />
-                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_248_692" result="shape" />
-                </filter>
-              </defs>
-            </svg>
-          </button>
-          <button onClick={() => scrollSlider('right')} className="hover:opacity-80 transition-opacity outline-none -ml-4" aria-label="Next">
-            <svg width="64" height="64" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g filter="url(#filter0_d_248_696)">
-                <rect x="20" y="16" width="44" height="44" rx="22" fill="white" shapeRendering="crispEdges" />
-                <path d="M47.8691 38.6191L39.1191 47.3691C39.0378 47.4504 38.9413 47.5148 38.835 47.5588C38.7288 47.6028 38.615 47.6255 38.5 47.6255C38.385 47.6255 38.2712 47.6028 38.165 47.5588C38.0587 47.5148 37.9622 47.4504 37.8809 47.3691C37.7996 47.2878 37.7352 47.1913 37.6912 47.085C37.6472 46.9788 37.6245 46.865 37.6245 46.75C37.6245 46.635 37.6472 46.5212 37.6912 46.415C37.7352 46.3087 37.7996 46.2122 37.8809 46.1309L46.013 38L37.8809 29.8691C37.7167 29.7049 37.6245 29.4822 37.6245 29.25C37.6245 29.0178 37.7167 28.7951 37.8809 28.6309C38.0451 28.4668 38.2678 28.3745 38.5 28.3745C38.7322 28.3745 38.9549 28.4668 39.1191 28.6309L47.8691 37.3809C47.9504 37.4622 48.015 37.5587 48.059 37.6649C48.103 37.7711 48.1257 37.885 48.1257 38C48.1257 38.115 48.103 38.2288 48.059 38.3351C48.015 38.4413 47.9504 38.5378 47.8691 38.6191Z" fill="black" />
-              </g>
-              <defs>
-                <filter id="filter0_d_248_696" x="0" y="0" width="84" height="84" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                  <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                  <feOffset dy="4" />
-                  <feGaussianBlur stdDeviation="10" />
-                  <feComposite in2="hardAlpha" operator="out" />
-                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
-                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_248_696" />
-                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_248_696" result="shape" />
-                </filter>
-              </defs>
-            </svg>
-          </button>
-        </div>
+            <button onClick={() => scrollSlider('left')} className="hover:opacity-80 transition-opacity outline-none" aria-label="Previous">
+              <svg width="64" height="64" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_d_248_692)">
+                  <rect x="64" y="60" width="44" height="44" rx="22" transform="rotate(-180 64 60)" fill="white" shapeRendering="crispEdges" />
+                  <path d="M36.1309 37.3809L44.8809 28.6309C44.9622 28.5496 45.0588 28.4852 45.165 28.4412C45.2712 28.3972 45.385 28.3745 45.5 28.3745C45.615 28.3745 45.7288 28.3972 45.835 28.4412C45.9413 28.4852 46.0378 28.5496 46.1191 28.6309C46.2004 28.7122 46.2649 28.8087 46.3088 28.915C46.3528 29.0212 46.3755 29.135 46.3755 29.25C46.3755 29.365 46.3528 29.4788 46.3088 29.585C46.2649 29.6913 46.2004 29.7878 46.1191 29.8691L37.987 38L46.1191 46.1309C46.2833 46.2951 46.3755 46.5178 46.3755 46.75C46.3755 46.9822 46.2833 47.2049 46.1191 47.3691C45.9549 47.5332 45.7322 47.6255 45.5 47.6255C45.2678 47.6255 45.0451 47.5332 44.8809 47.3691L36.1309 38.6191C36.0496 38.5378 35.985 38.4413 35.941 38.3351C35.897 38.2289 35.8743 38.115 35.8743 38C35.8743 37.885 35.897 37.7712 35.941 37.6649C35.985 37.5587 36.0496 37.4622 36.1309 37.3809Z" fill="black" />
+                </g>
+                <defs>
+                  <filter id="filter0_d_248_692" x="0" y="0" width="84" height="84" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feOffset dy="4" />
+                    <feGaussianBlur stdDeviation="10" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_248_692" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_248_692" result="shape" />
+                  </filter>
+                </defs>
+              </svg>
+            </button>
+            <button onClick={() => scrollSlider('right')} className="hover:opacity-80 transition-opacity outline-none -ml-4" aria-label="Next">
+              <svg width="64" height="64" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_d_248_696)">
+                  <rect x="20" y="16" width="44" height="44" rx="22" fill="white" shapeRendering="crispEdges" />
+                  <path d="M47.8691 38.6191L39.1191 47.3691C39.0378 47.4504 38.9413 47.5148 38.835 47.5588C38.7288 47.6028 38.615 47.6255 38.5 47.6255C38.385 47.6255 38.2712 47.6028 38.165 47.5588C38.0587 47.5148 37.9622 47.4504 37.8809 47.3691C37.7996 47.2878 37.7352 47.1913 37.6912 47.085C37.6472 46.9788 37.6245 46.865 37.6245 46.75C37.6245 46.635 37.6472 46.5212 37.6912 46.415C37.7352 46.3087 37.7996 46.2122 37.8809 46.1309L46.013 38L37.8809 29.8691C37.7167 29.7049 37.6245 29.4822 37.6245 29.25C37.6245 29.0178 37.7167 28.7951 37.8809 28.6309C38.0451 28.4668 38.2678 28.3745 38.5 28.3745C38.7322 28.3745 38.9549 28.4668 39.1191 28.6309L47.8691 37.3809C47.9504 37.4622 48.015 37.5587 48.059 37.6649C48.103 37.7711 48.1257 37.885 48.1257 38C48.1257 38.115 48.103 38.2288 48.059 38.3351C48.015 38.4413 47.9504 38.5378 47.8691 38.6191Z" fill="black" />
+                </g>
+                <defs>
+                  <filter id="filter0_d_248_696" x="0" y="0" width="84" height="84" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feOffset dy="4" />
+                    <feGaussianBlur stdDeviation="10" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_248_696" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_248_696" result="shape" />
+                  </filter>
+                </defs>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
