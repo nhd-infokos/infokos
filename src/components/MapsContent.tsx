@@ -361,7 +361,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
       {/* Two-Column Layout */}
       <div className="w-full flex flex-col lg:flex-row gap-6 mt-4">
         {/* Left Column — Kos Card List */}
-        <div className="w-full lg:w-1/2 max-h-[700px] overflow-y-auto pr-2 scrollbar-thin">
+        <div className="w-full lg:w-[60%] max-h-[700px] overflow-y-auto pr-2 scrollbar-thin">
           {filteredKosList.length > 0 ? (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
               {filteredKosList.map((kos) => (
@@ -379,8 +379,8 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
                     <div className="flex justify-between items-center mt-5">
                       <span className="text-[#888888] text-[15px]">Start from</span>
                       <div>
-                        <span className="font-medium text-[#E53E3E] text-[20px]">{formatPrice(kos.price)}</span>
-                        <span className="font-medium text-[#111111] text-[20px]">/monthly</span>
+                        <span className="font-medium text-[#E53E3E] text-[18px]">{formatPrice(kos.price)}</span>
+                        <span className="font-medium text-[#111111] text-[16px]">/monthly</span>
                       </div>
                     </div>
                   </div>
@@ -399,7 +399,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
         </div>
 
         {/* Right Column — Map */}
-        <div className="w-full lg:w-1/2 lg:sticky lg:top-6 h-[500px] lg:h-[700px]">
+        <div className="w-full lg:w-[40%] lg:sticky lg:top-6 h-[500px] lg:h-[700px]">
           <Map
             kosList={mapKosList}
             center={mapCenter}
