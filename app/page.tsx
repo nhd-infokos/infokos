@@ -10,9 +10,13 @@ import { getKosList } from "@/services/kos.service";
 import { getActiveBanner } from "@/services/banner.service";
 import Navbar from "@/components/Navbar";
 
+export const revalidate = 60; // Cache page for 60 seconds
+
 export default async function Home() {
-  const kosList = await getKosList();
-  const banner = await getActiveBanner();
+  const [kosList, banner] = await Promise.all([
+    getKosList(),
+    getActiveBanner(),
+  ]);
 
   return (
     <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white pt-6 overflow-x-clip">

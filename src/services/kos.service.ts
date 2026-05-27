@@ -69,10 +69,10 @@ export interface KosFilters {
 
 /**
  * Get list of published kos with optional filters.
- * Includes facilities.
+ * Uses admin client (no cookies) so it's compatible with Next.js caching.
  */
 export async function getKosList(filters?: KosFilters) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdmin()
   let query = supabase
     .from('kos')
     .select('*, kos_facilities(*), kos_tags(*)')

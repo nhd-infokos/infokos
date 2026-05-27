@@ -1,4 +1,4 @@
-import { getKosList } from "@/services/kos.service";
+import { createSupabaseAdmin } from "@/lib/supabase-admin";
 import LoginForm from "@/components/LoginForm";
 
 export const metadata = {
@@ -6,9 +6,19 @@ export const metadata = {
   description: 'Log in to your Nahdia Infokost account to find the best properties.',
 };
 
+export const revalidate = 120; // Cache page for 120 seconds
+
 export default async function LoginPage() {
-  const kosList = await getKosList();
-  const images = kosList.map(kos => kos.image_url).filter(Boolean) as string[];
+  // Lightweight query - only fetch image URLs, no need for full kos data
+  const supabase = createSupabaseAdmin();
+  const { data } = await supabase
+    .from('kos')
+    .select('image_url')
+    .eq('is_published', true)
+    .not('image_url', 'is', null)
+    .limit(10);
+
+  const images = (data || []).map(kos => kos.image_url).filter(Boolean) as string[];
 
   // Fallback images in case the database doesn't have enough
   const fallbackImages = [

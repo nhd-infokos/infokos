@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server';
+import { createSupabaseAdmin } from '@/lib/supabase-admin';
 
 export interface Banner {
   id: string;
@@ -11,9 +12,10 @@ export interface Banner {
 
 /**
  * Get the currently active banner.
+ * Uses admin client (no cookies) so it's compatible with Next.js caching.
  */
 export async function getActiveBanner() {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdmin();
   const { data, error } = await supabase
     .from('banners')
     .select('*')
