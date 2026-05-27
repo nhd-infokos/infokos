@@ -9,7 +9,6 @@ import type { Kos } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
 import { formatPrice } from "@/lib/utils";
 import { KRL_LINES, MRT_LINES, isNearKrlLine } from "@/lib/krl-routes";
-import { SlidersHorizontal } from "lucide-react";
 
 // Coordinate centers for each location option
 const LOCATION_CENTERS: Record<string, [number, number]> = {
@@ -222,7 +221,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
             >
-              <SlidersHorizontal className="w-6 h-6 text-black shrink-0" weight="duotone" />
+              <FadersHorizontal className="w-6 h-6 text-black shrink-0" weight="duotone" />
               <span className="text-[15px] font-semibold text-gray-900">Filters</span>
               {activeFilterCount > 0 && (
                 <span className="bg-black text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center ml-1">
