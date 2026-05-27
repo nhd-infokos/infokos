@@ -23,10 +23,10 @@ export default async function Home() {
       {/* Navigation Header */}
       <Navbar />
 
-      <main className="flex flex-col items-center w-full px-[50px] pb-16">
+      <main className="flex flex-col items-center w-full pb-16">
         {/* Hero Banner */}
-        <div className="relative w-full mb-12 lg:mb-20">
-          <div className="relative w-full aspect-[16/7] md:aspect-[16/6] min-h-[400px] md:min-h-[540px] rounded-[24px] md:rounded-[32px] overflow-hidden">
+        <div className="relative w-full mb-12 lg:mb-20 md:px-[50px]">
+          <div className="relative w-full aspect-[16/7] md:aspect-[16/6] min-h-[400px] md:min-h-[540px] rounded-none md:rounded-[32px] overflow-hidden">
             {/* Desktop Banner */}
             {banner?.desktop_image_url && (
               <Image
@@ -94,21 +94,21 @@ export default async function Home() {
           </div>
 
           {/* Filter Form - overlapping bottom */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-full max-w-[880px] px-4 md:block">
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-full max-w-[880px] px-6 md:px-0">
             <HomeSearchForm />
           </div>
         </div>
 
-        <section className="w-full mt-24 mb-10">
+        <section className="w-full mt-24 mb-10 px-4 md:px-[50px]">
           <KosSlider kosList={kosList} />
         </section>
 
-        <section className="w-full mt-24 mb-10">
+        <section className="w-full mt-24 mb-10 px-4 md:px-[50px]">
           <KontrakanSlider kosList={kosList} />
         </section>
 
         {/* Call to Action Section */}
-        <section className="w-full mt-24">
+        <section className="w-full mt-24 px-4 md:px-[50px]">
           <div className="bg-[#F0F0F0] rounded-[32px] flex flex-col md:flex-row items-center justify-between relative min-h-[400px] overflow-hidden">
             {/* Left Image */}
             <div className="w-full md:w-[35%] h-[300px] md:h-[450px] relative hidden md:block">
