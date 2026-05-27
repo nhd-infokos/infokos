@@ -2,24 +2,26 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { MapPin, GenderIntersex, Money } from "@phosphor-icons/react";
+import { MapPin, GenderIntersex, Money, CaretDown, FadersHorizontal, Train, CaretUp } from "@phosphor-icons/react";
 import type { Kos } from "@/types/kos";
 import { iconMap } from "@/lib/icon-map";
 import { formatPrice } from "@/lib/utils";
+import { KRL_LINES, MRT_LINES, isNearKrlLine } from "@/lib/krl-routes";
+import { SlidersHorizontal } from "lucide-react";
 
 // Coordinate centers for each location option
 const LOCATION_CENTERS: Record<string, [number, number]> = {
   "Jakarta Selatan": [-6.2615, 106.8106],
-  "Jakarta Pusat":  [-6.1862, 106.8340],
-  "Jakarta Barat":  [-6.1680, 106.7580],
-  "Jakarta Timur":  [-6.2250, 106.9004],
-  "Jakarta Utara":  [-6.1384, 106.8638],
-  "Bali":            [-8.4095, 115.1889],
+  "Jakarta Pusat": [-6.1862, 106.8340],
+  "Jakarta Barat": [-6.1680, 106.7580],
+  "Jakarta Timur": [-6.2250, 106.9004],
+  "Jakarta Utara": [-6.1384, 106.8638],
+  "Bali": [-8.4095, 115.1889],
 };
 
-const DEFAULT_CENTER: [number, number] = [-6.2088, 106.8456]; // General Jakarta center
+// No default center here, let Map.tsx handle it so it can adjust zoom accordingly
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -55,6 +57,32 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
   const [filterLokasi, setFilterLokasi] = useState(initialLocation || "Lokasi");
   const [filterTipe, setFilterTipe] = useState(initialType || "Tipe Kos");
   const [filterHarga, setFilterHarga] = useState(initialPrice || "Harga");
+  const [selectedRailLines, setSelectedRailLines] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [krlSectionOpen, setKrlSectionOpen] = useState(true);
+  const [mrtSectionOpen, setMrtSectionOpen] = useState(true);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleRailLine = (lineId: string) => {
+    setSelectedRailLines((prev) =>
+      prev.includes(lineId)
+        ? prev.filter((id) => id !== lineId)
+        : [...prev, lineId]
+    );
+  };
+
+  const activeFilterCount = selectedRailLines.length;
 
   const filteredKosList = kosList.filter((kos) => {
     // Location filter
@@ -76,6 +104,16 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
       if (filterHarga === "> 3 Juta" && price <= 3000000) return false;
     }
 
+    // KRL Line proximity filter
+    if (selectedRailLines.length > 0 && kos.latitude && kos.longitude) {
+      const isNearAnySelectedLine = selectedRailLines.some((lineId) => {
+        const line = [...KRL_LINES, ...MRT_LINES].find((l) => l.id === lineId);
+        if (!line) return false;
+        return isNearKrlLine(kos.latitude!, kos.longitude!, line.coordinates);
+      });
+      if (!isNearAnySelectedLine) return false;
+    }
+
     return true;
   });
 
@@ -95,70 +133,228 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
     }));
 
   // Determine map center based on selected location
-  const mapCenter = LOCATION_CENTERS[filterLokasi] || DEFAULT_CENTER;
+  const mapCenter = LOCATION_CENTERS[filterLokasi];
 
   return (
     <>
-      <div className="flex flex-col items-center mb-8 text-center mt-6">
+      <div className="flex flex-col items-center mb-8 text-center mt-6 w-full">
         <span className="text-sm font-medium uppercase mb-3 text-gray-800 tracking-widest">JELAJAHI KOS LEWAT MAPS</span>
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium leading-[1.3] text-[#111111] mb-8">
           Cari kos hemat hingga eksklusif di sekitar anda
         </h1>
+        <div className="flex flex-col md:flex-row items-stretch justify-center gap-4 w-full px-4 md:px-0">
+          <div className="flex flex-col md:flex-row items-stretch bg-white rounded-[24px] md:rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-4 md:p-6 w-full md:w-fit gap-4 md:gap-0">
+            {/* Lokasi */}
+            <div className="relative flex items-center px-2 md:px-6 group border-b md:border-b-0 border-gray-100 pb-4 md:pb-0">
+              <MapPin className="w-6 h-6 text-black mr-3 shrink-0" weight="duotone" />
+              <div className="flex flex-col min-w-0 pr-8 text-left">
+                <span className="text-[15px] font-semibold text-gray-900 leading-tight">Lokasi</span>
+                <select
+                  className="appearance-none w-full bg-transparent text-[14px] text-gray-500 focus:outline-none cursor-pointer mt-0.5 truncate"
+                  value={filterLokasi}
+                  onChange={(e) => setFilterLokasi(e.target.value)}
+                >
+                  <option value="Lokasi">pilih lokasi</option>
+                  <option value="Jakarta Selatan">Jakarta Selatan</option>
+                  <option value="Jakarta Pusat">Jakarta Pusat</option>
+                  <option value="Jakarta Barat">Jakarta Barat</option>
+                  <option value="Jakarta Timur">Jakarta Timur</option>
+                  <option value="Jakarta Utara">Jakarta Utara</option>
+                  <option value="Bali">Bali</option>
+                </select>
+              </div>
+              <div className="pointer-events-none absolute right-2 md:right-6 flex items-center text-gray-900">
+                <CaretDown className="w-4 h-4" weight="bold" />
+              </div>
+            </div>
 
-        {/* Pill Filter Bar */}
-        <div className="flex flex-col md:flex-row items-center bg-white md:border border-gray-800 md:rounded-full md:p-2 justify-center w-full md:w-auto gap-3 md:gap-0">
-          <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
-            <MapPin className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-            <select
-              className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
-              value={filterLokasi}
-              onChange={(e) => setFilterLokasi(e.target.value)}
-            >
-              <option value="Lokasi">Lokasi</option>
-              <option value="Jakarta Selatan">Jakarta Selatan</option>
-              <option value="Jakarta Pusat">Jakarta Pusat</option>
-              <option value="Jakarta Barat">Jakarta Barat</option>
-              <option value="Jakarta Timur">Jakarta Timur</option>
-              <option value="Jakarta Utara">Jakarta Utara</option>
-              <option value="Bali">Bali</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+            <div className="hidden md:block h-10 w-px bg-gray-200 shrink-0 self-center" />
+
+            {/* Budget */}
+            <div className="relative flex items-center px-2 md:px-6 group border-b md:border-b-0 border-gray-100 pb-4 md:pb-0">
+              <Money className="w-6 h-6 text-black mr-3 shrink-0" weight="duotone" />
+              <div className="flex flex-col min-w-0 pr-8 text-left">
+                <span className="text-[15px] font-semibold text-gray-900 leading-tight">Budget</span>
+                <select
+                  className="appearance-none w-full bg-transparent text-[14px] text-gray-500 focus:outline-none cursor-pointer mt-0.5 truncate"
+                  value={filterHarga}
+                  onChange={(e) => setFilterHarga(e.target.value)}
+                >
+                  <option value="Harga">set budget</option>
+                  <option value="1 - 2 Juta">1 - 2 Juta</option>
+                  <option value="> 3 Juta">&gt; 3 Juta</option>
+                </select>
+              </div>
+              <div className="pointer-events-none absolute right-2 md:right-6 flex items-center text-gray-900">
+                <CaretDown className="w-4 h-4" weight="bold" />
+              </div>
             </div>
+
+            <div className="hidden md:block h-10 w-px bg-gray-200 shrink-0 self-center" />
+
+            {/* Pilih Properti */}
+            <div className="relative flex items-center px-2 md:px-6 group border-b md:border-b-0 border-gray-100 pb-4 md:pb-0">
+              <GenderIntersex className="w-6 h-6 text-black mr-3 shrink-0" weight="duotone" />
+              <div className="flex flex-col min-w-0 pr-8 text-left">
+                <span className="text-[15px] font-semibold text-gray-900 leading-tight">Pilih Properti</span>
+                <select
+                  className="appearance-none w-full bg-transparent text-[14px] text-gray-500 focus:outline-none cursor-pointer mt-0.5 truncate"
+                  value={filterTipe}
+                  onChange={(e) => setFilterTipe(e.target.value)}
+                >
+                  <option value="Tipe Kos">pilih tipe properti</option>
+                  <option value="Putra">Putra</option>
+                  <option value="Putri">Putri</option>
+                  <option value="Campur">Campur</option>
+                  <option value="Kontrakan">Kontrakan</option>
+                </select>
+              </div>
+              <div className="pointer-events-none absolute right-2 md:right-6 flex items-center text-gray-900">
+                <CaretDown className="w-4 h-4" weight="bold" />
+              </div>
+            </div>
+
           </div>
-          <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
-          <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
-            <GenderIntersex className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-            <select
-              className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
-              value={filterTipe}
-              onChange={(e) => setFilterTipe(e.target.value)}
+
+          {/* Filters Button */}
+          <div className="relative bg-white rounded-[24px] md:rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-4 md:p-6 w-full md:w-auto flex items-center justify-center shrink-0" ref={filterRef}>
+            <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
             >
-              <option value="Tipe Kos">Tipe Kos</option>
-              <option value="Putra">Putra</option>
-              <option value="Putri">Putri</option>
-              <option value="Campur">Campur</option>
-              <option value="Kontrakan">Kontrakan</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-            </div>
-          </div>
-          <div className="hidden md:block h-8 w-px bg-gray-300 mx-2"></div>
-          <div className="relative flex items-center w-full md:w-auto border border-gray-300 md:border-transparent rounded-full md:rounded-none px-6 py-4 md:py-4 md:px-10">
-            <Money className="w-5 h-5 text-gray-900 mr-2" weight="duotone" />
-            <select
-              className="appearance-none w-full md:w-auto bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-8 md:pr-6 text-center md:text-left"
-              value={filterHarga}
-              onChange={(e) => setFilterHarga(e.target.value)}
-            >
-              <option value="Harga">Harga</option>
-              <option value="1 - 2 Juta">1 - 2 Juta</option>
-              <option value="> 3 Juta">&gt; 3 Juta</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-1 text-gray-900">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-            </div>
+              <SlidersHorizontal className="w-6 h-6 text-black shrink-0" weight="duotone" />
+              <span className="text-[15px] font-semibold text-gray-900">Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="bg-black text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center ml-1">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+
+            {/* Filters Dropdown Panel */}
+            {isFilterOpen && (
+              <div className="absolute right-0 top-full mt-3 w-[280px] bg-white rounded-[20px] shadow-[0_12px_40px_rgb(0,0,0,0.12)] border border-gray-100 z-50 overflow-hidden">
+                <div className="p-5">
+                  {/* KRL Lines Section */}
+                  <div>
+                    <button
+                      onClick={() => setKrlSectionOpen(!krlSectionOpen)}
+                      className="flex items-center justify-between w-full mb-4"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Train className="w-5 h-5 text-gray-900" weight="duotone" />
+                        <span className="text-[15px] font-semibold text-gray-900">KRL Lines</span>
+                      </div>
+                      {krlSectionOpen ? (
+                        <CaretUp className="w-4 h-4 text-gray-500" weight="bold" />
+                      ) : (
+                        <CaretDown className="w-4 h-4 text-gray-500" weight="bold" />
+                      )}
+                    </button>
+
+                    {krlSectionOpen && (
+                      <div className="flex flex-col gap-3 pl-1">
+                        {KRL_LINES.map((line) => (
+                          <label
+                            key={line.id}
+                            className="flex items-center gap-3 cursor-pointer group"
+                          >
+                            <div className="relative">
+                              <input
+                                type="checkbox"
+                                checked={selectedRailLines.includes(line.id)}
+                                onChange={() => toggleRailLine(line.id)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-5 h-5 rounded-md border-2 border-gray-300 peer-checked:border-black peer-checked:bg-black transition-all flex items-center justify-center">
+                                {selectedRailLines.includes(line.id) && (
+                                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3 h-3 rounded-full shrink-0"
+                                style={{ backgroundColor: line.color }}
+                              />
+                              <span className="text-[14px] text-gray-800 font-medium group-hover:text-black transition-colors">
+                                {line.name}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* MRT Lines Section */}
+                  <div className="mt-6 border-t border-gray-100 pt-4">
+                    <button
+                      onClick={() => setMrtSectionOpen(!mrtSectionOpen)}
+                      className="flex items-center justify-between w-full mb-4"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Train className="w-5 h-5 text-gray-900" weight="duotone" />
+                        <span className="text-[15px] font-semibold text-gray-900">MRT Lines</span>
+                      </div>
+                      {mrtSectionOpen ? (
+                        <CaretUp className="w-4 h-4 text-gray-500" weight="bold" />
+                      ) : (
+                        <CaretDown className="w-4 h-4 text-gray-500" weight="bold" />
+                      )}
+                    </button>
+
+                    {mrtSectionOpen && (
+                      <div className="flex flex-col gap-3 pl-1">
+                        {MRT_LINES.map((line) => (
+                          <label
+                            key={line.id}
+                            className="flex items-center gap-3 cursor-pointer group"
+                          >
+                            <div className="relative">
+                              <input
+                                type="checkbox"
+                                checked={selectedRailLines.includes(line.id)}
+                                onChange={() => toggleRailLine(line.id)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-5 h-5 rounded-md border-2 border-gray-300 peer-checked:border-black peer-checked:bg-black transition-all flex items-center justify-center">
+                                {selectedRailLines.includes(line.id) && (
+                                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3 h-3 rounded-full shrink-0"
+                                style={{ backgroundColor: line.color }}
+                              />
+                              <span className="text-[14px] text-gray-800 font-medium group-hover:text-black transition-colors">
+                                {line.name}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Apply Button */}
+                <div className="px-5 pb-5 pt-2">
+                  <button
+                    onClick={() => setIsFilterOpen(false)}
+                    className="w-full py-3 bg-black text-white text-[14px] font-bold rounded-full hover:bg-gray-800 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -208,6 +404,7 @@ export default function MapsContent({ kosList, initialLocation, initialType, ini
           <Map
             kosList={mapKosList}
             center={mapCenter}
+            activeLines={selectedRailLines}
             className="w-full h-full rounded-[24px] overflow-hidden shadow-sm border border-gray-100 relative z-0"
           />
         </div>

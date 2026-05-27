@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { formatPriceShort } from "@/lib/utils";
+import { KRL_LINES, MRT_LINES } from "@/lib/krl-routes";
 
 interface MapKos {
   id: string;
@@ -26,6 +27,7 @@ interface MapProps {
   kosList?: MapKos[];
   className?: string;
   center?: [number, number];
+  activeLines?: string[]; // IDs of active KRL lines to highlight
 }
 
 const createPriceIcon = (price: string) => {
@@ -54,92 +56,7 @@ function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }
   return null;
 }
 
-const KRL_BOGOR_JAKARTAKOTA: [number, number][] = [
-  [-6.59427, 106.79081], // Bogor
-  [-6.53058, 106.80061], // Cilebut
-  [-6.49167, 106.79417], // Bojong Gede
-  [-6.44879, 106.80241], // Citayam
-  [-6.40442, 106.81709], // Depok
-  [-6.39104, 106.82168], // Depok Baru
-  [-6.36883, 106.83215], // Pondok Cina
-  [-6.36075, 106.83175], // Universitas Indonesia
-  [-6.33583, 106.83417], // Universitas Pancasila
-  [-6.32667, 106.83222], // Lenteng Agung
-  [-6.30833, 106.83667], // Tanjung Barat
-  [-6.28111, 106.84056], // Pasar Minggu
-  [-6.26278, 106.85444], // Pasar Minggu Baru
-  [-6.25361, 106.85306], // Duren Kalibata
-  [-6.24255, 106.85869], // Cawang
-  [-6.22611, 106.85611], // Tebet
-  [-6.20778, 106.85278], // Manggarai
-  [-6.19861, 106.84139], // Cikini
-  [-6.18556, 106.83222], // Gondangdia
-  [-6.16672, 106.83047], // Juanda
-  [-6.16067, 106.82764], // Sawah Besar
-  [-6.14968, 106.82703], // Mangga Besar
-  [-6.14129, 106.82313], // Jayakarta
-  [-6.13758, 106.81463], // Jakarta Kota
-];
-
-const KRL_CIKARANG_KAMPUNGBANDAN: [number, number][] = [
-  [-6.25361, 107.14222], // Cikarang
-  [-6.25539, 107.14513], // Metland Telagamurni
-  [-6.26278, 107.08028], // Cibitung
-  [-6.25861, 107.05600], // Tambun
-  [-6.24689, 107.01811], // Bekasi Timur
-  [-6.23590, 106.99860], // Bekasi
-  [-6.22611, 106.98222], // Kranji
-  [-6.21903, 106.95243], // Cakung
-  [-6.21694, 106.93556], // Klender Baru
-  [-6.22416, 106.92083], // Buaran
-  [-6.21333, 106.89972], // Klender
-  [-6.21500, 106.87000], // Jatinegara
-  [-6.21256, 106.85983], // Matraman
-  [-6.20778, 106.85278], // Manggarai
-  [-6.20250, 106.82333], // Sudirman
-  [-6.20083, 106.81583], // Karet
-  [-6.18556, 106.81056], // Tanah Abang
-  [-6.15611, 106.80139], // Duri
-  [-6.14417, 106.80056], // Angke
-  [-6.13278, 106.82861], // Kampung Bandan
-];
-
-const KRL_RANGKASBITUNG_TANAHABANG: [number, number][] = [
-  [-6.35266, 106.25153], // Rangkasbitung
-  [-6.33583, 106.32694], // Citeras
-  [-6.33231, 106.39656], // Maja
-  [-6.32667, 106.43417], // Tigaraksa
-  [-6.34000, 106.46700], // Tenjo
-  [-6.33805, 106.49246], // Daru
-  [-6.35437, 106.50958], // Cilejit
-  [-6.34415, 106.56866], // Parung Panjang
-  [-6.33139, 106.61917], // Cicayur
-  [-6.32222, 106.63722], // Cisauk
-  [-6.32014, 106.66515], // Serpong
-  [-6.31750, 106.67556], // Rawa Buntu
-  [-6.29917, 106.71694], // Sudimara
-  [-6.28861, 106.72917], // Jurangmangu
-  [-6.28083, 106.74889], // Pondok Ranji
-  [-6.23722, 106.78250], // Kebayoran
-  [-6.20750, 106.79750], // Palmerah
-  [-6.18556, 106.81056], // Tanah Abang
-];
-
-const KRL_TANGERANG_DURI: [number, number][] = [
-  [-6.18028, 106.62917], // Tangerang
-  [-6.17600, 106.64680], // Tanah Tinggi
-  [-6.17221, 106.66509], // Batu Ceper
-  [-6.17139, 106.67611], // Poris
-  [-6.15487, 106.70605], // Kalideres
-  [-6.16269, 106.72316], // Rawa Buaya
-  [-6.15982, 106.73701], // Bojong Indah
-  [-6.16010, 106.75380], // Taman Kota
-  [-6.16127, 106.77147], // Pesing
-  [-6.16203, 106.78937], // Grogol
-  [-6.15611, 106.80139], // Duri
-];
-
-export default function Map({ kosList: externalKosList, className, center: externalCenter }: MapProps) {
+export default function Map({ kosList: externalKosList, className, center: externalCenter, activeLines }: MapProps) {
   const router = useRouter();
   const [mapId, setMapId] = useState("");
   const [internalKosList, setInternalKosList] = useState<MapKos[]>([]);
@@ -163,8 +80,10 @@ export default function Map({ kosList: externalKosList, className, center: exter
   }, [externalKosList]);
 
   const kosList = externalKosList ?? internalKosList;
-  const defaultCenter: [number, number] = [-6.2615, 106.8106];
+  const defaultCenter: [number, number] = [-6.35, 106.85]; // Center of Jabodetabek
   const position = externalCenter || defaultCenter;
+
+  const hasActiveLines = activeLines && activeLines.length > 0;
 
   if (!mapId) {
     return (
@@ -179,28 +98,48 @@ export default function Map({ kosList: externalKosList, className, center: exter
       <MapContainer
         key={mapId}
         center={position}
-        zoom={13}
+        zoom={externalCenter ? 13 : 10}
         scrollWheelZoom={false}
         className="w-full h-full"
         id="map"
       >
-        <ChangeView center={position} zoom={13} />
+        <ChangeView center={position} zoom={externalCenter ? 13 : 10} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* KRL Red Line: Bogor to Jakarta Kota */}
-        <Polyline positions={KRL_BOGOR_JAKARTAKOTA} pathOptions={{ color: 'red', weight: 4, opacity: 0.7 }} />
+        {/* KRL Lines - highlight active ones, dim inactive ones */}
+        {KRL_LINES.map((line) => {
+          const isActive = !hasActiveLines || activeLines!.includes(line.id);
+          return (
+            <Polyline
+              key={line.id}
+              positions={line.coordinates}
+              pathOptions={{
+                color: line.color,
+                weight: isActive ? 4 : 2,
+                opacity: isActive ? 0.8 : 0.2,
+              }}
+            />
+          );
+        })}
 
-        {/* KRL Blue Line: Cikarang to Kampung Bandan */}
-        <Polyline positions={KRL_CIKARANG_KAMPUNGBANDAN} pathOptions={{ color: '#0066FF', weight: 4, opacity: 0.7 }} />
-
-        {/* KRL Green Line: Rangkasbitung to Tanah Abang */}
-        <Polyline positions={KRL_RANGKASBITUNG_TANAHABANG} pathOptions={{ color: '#00B14F', weight: 4, opacity: 0.7 }} />
-
-        {/* KRL Brown Line: Tangerang to Duri */}
-        <Polyline positions={KRL_TANGERANG_DURI} pathOptions={{ color: '#8B4513', weight: 4, opacity: 0.7 }} />
+        {/* MRT Lines - highlight active ones, dim inactive ones */}
+        {MRT_LINES.map((line) => {
+          const isActive = !hasActiveLines || activeLines!.includes(line.id);
+          return (
+            <Polyline
+              key={line.id}
+              positions={line.coordinates}
+              pathOptions={{
+                color: line.color,
+                weight: isActive ? 4 : 2,
+                opacity: isActive ? 0.8 : 0.2,
+              }}
+            />
+          );
+        })}
 
         <MarkerClusterGroup
           chunkedLoading
