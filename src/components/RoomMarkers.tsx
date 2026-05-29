@@ -1,8 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { KosRoom } from "@/types/kos";
+
+/**
+ * Check if a URL is a shortened TikTok link (vt.tiktok.com or vm.tiktok.com)
+ */
+function isShortenedTiktokUrl(url: string): boolean {
+  return /^https?:\/\/(vt|vm)\.tiktok\.com\//i.test(url);
+}
 
 /**
  * Convert social media video URLs into embeddable iframe URLs.
@@ -65,13 +72,47 @@ function getVideoEmbedUrl(url: string): { embedUrl: string; platform: string } |
 
 export default function RoomMarkers({ rooms }: { rooms: KosRoom[] }) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [resolvedVideoUrl, setResolvedVideoUrl] = useState<string | null>(null);
+  const [isResolvingVideo, setIsResolvingVideo] = useState(false);
 
   const activeRoom = rooms.find((r) => r.id === activeModal);
 
-  const videoEmbed = useMemo(() => {
-    if (!activeRoom?.video_url) return null;
-    return getVideoEmbedUrl(activeRoom.video_url);
+  // Resolve shortened TikTok URLs via server-side API
+  useEffect(() => {
+    setResolvedVideoUrl(null);
+    setIsResolvingVideo(false);
+
+    if (!activeRoom?.video_url) return;
+
+    if (isShortenedTiktokUrl(activeRoom.video_url)) {
+      setIsResolvingVideo(true);
+      fetch('/api/resolve-video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: activeRoom.video_url }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.resolvedUrl) {
+            setResolvedVideoUrl(data.resolvedUrl);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to resolve video URL:', err);
+        })
+        .finally(() => {
+          setIsResolvingVideo(false);
+        });
+    }
   }, [activeRoom?.video_url]);
+
+  // Use resolved URL if available, otherwise use original
+  const effectiveVideoUrl = resolvedVideoUrl || activeRoom?.video_url || null;
+
+  const videoEmbed = useMemo(() => {
+    if (!effectiveVideoUrl) return null;
+    return getVideoEmbedUrl(effectiveVideoUrl);
+  }, [effectiveVideoUrl]);
 
   return (
     <>
@@ -143,7 +184,17 @@ export default function RoomMarkers({ rooms }: { rooms: KosRoom[] }) {
             )}
             
             {/* Video Embed */}
-            {videoEmbed && (
+            {isResolvingVideo && (
+              <div className="mt-3 w-full rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
+                <div className="relative w-full aspect-[9/16] flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    <span className="text-[12px] text-zinc-400">Memuat video...</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            {!isResolvingVideo && videoEmbed && (
               <div className="mt-3 w-full rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
                 <div className="relative w-full aspect-[9/16]">
                   <iframe

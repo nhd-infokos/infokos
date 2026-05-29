@@ -441,9 +441,9 @@ export default function MarkerManager({ kosId }: MarkerManagerProps) {
                 value={form.video_url || ""} 
                 onChange={(e) => setForm({...form, video_url: e.target.value})} 
                 className="bg-zinc-800 border-zinc-700 text-white" 
-                placeholder="https://www.tiktok.com/@user/video/... atau https://www.instagram.com/reel/..." 
+                placeholder="https://vt.tiktok.com/... atau https://www.tiktok.com/@user/video/..." 
               />
-              <p className="text-xs text-zinc-500">Tempel link dari TikTok, Instagram Reels, atau YouTube Shorts. Video akan tampil di halaman depan saat marker diklik.</p>
+              <p className="text-xs text-zinc-500">Tempel link dari TikTok (termasuk link pendek vt.tiktok.com), Instagram Reels, atau YouTube Shorts. Video akan tampil di halaman depan saat marker diklik.</p>
               {form.video_url && (
                 <div className="mt-1 p-2 bg-zinc-800/60 rounded-lg border border-zinc-700">
                   <p className="text-xs text-green-400 mb-1">✓ Link video tersimpan</p>
