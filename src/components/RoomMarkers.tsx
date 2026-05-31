@@ -5,29 +5,22 @@ import { useState, useMemo, useEffect } from "react";
 import type { KosRoom } from "@/types/kos";
 
 /**
- * Check if a URL is a shortened TikTok link (vt.tiktok.com or vm.tiktok.com)
+ * Check if a URL is a TikTok link (shortened or full).
+ * Handles: vt.tiktok.com, vm.tiktok.com, www.tiktok.com, tiktok.com
  */
-function isShortenedTiktokUrl(url: string): boolean {
-  return /^https?:\/\/(vt|vm)\.tiktok\.com\//i.test(url);
+function isTiktokUrl(url: string): boolean {
+  return /^https?:\/\/(vt\.|vm\.|www\.)?tiktok\.com\//i.test(url);
 }
 
 /**
  * Convert social media video URLs into embeddable iframe URLs.
- * Supports: TikTok, Instagram Reels, YouTube Shorts / regular YouTube
+ * Supports: Instagram Reels, YouTube Shorts / regular YouTube
+ * Note: TikTok uses oEmbed approach (not iframe), handled separately.
  */
 function getVideoEmbedUrl(url: string): { embedUrl: string; platform: string } | null {
   if (!url) return null;
   
   try {
-    // TikTok: https://www.tiktok.com/@user/video/1234567890
-    const tiktokMatch = url.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
-    if (tiktokMatch) {
-      return {
-        embedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`,
-        platform: "TikTok"
-      };
-    }
-
     // Instagram Reels: https://www.instagram.com/reel/ABC123/ or /reels/ABC123/
     const igReelMatch = url.match(/instagram\.com\/(?:reel|reels)\/([\w-]+)/);
     if (igReelMatch) {
@@ -70,49 +63,133 @@ function getVideoEmbedUrl(url: string): { embedUrl: string; platform: string } |
   }
 }
 
+/**
+ * TikTok embed component using direct iframe approach.
+ *
+ * Strategy: resolve the TikTok URL (especially shortened vt./vm. links)
+ * to extract the video ID, then embed via iframe at:
+ *   https://www.tiktok.com/embed/v2/VIDEO_ID
+ *
+ * This is far more reliable in React SPAs than the blockquote + embed.js
+ * approach, which has timing/caching/DOM lifecycle issues.
+ */
+function TikTokEmbed({ videoUrl }: { videoUrl: string }) {
+  const [videoId, setVideoId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(false);
+    setVideoId(null);
+
+    // Try to extract video ID from the URL directly first (avoids API call)
+    const directMatch = videoUrl.match(/\/video\/(\d+)/);
+    if (directMatch) {
+      setVideoId(directMatch[1]);
+      setLoading(false);
+      return;
+    }
+
+    // For shortened URLs (vt.tiktok.com, vm.tiktok.com), resolve via API
+    fetch('/api/resolve-video', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: videoUrl }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (cancelled) return;
+        if (data.videoId) {
+          setVideoId(data.videoId);
+        } else {
+          setError(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [videoUrl]);
+
+  if (loading) {
+    return (
+      <div className="mt-3 w-full rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
+        <div className="relative w-full aspect-[9/16] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            <span className="text-[12px] text-zinc-400">Memuat video TikTok...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !videoId) {
+    // Fallback: show a link to open in TikTok
+    return (
+      <div className="mt-3 w-full rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
+        <a
+          href={videoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative w-full aspect-[9/16] flex items-center justify-center group"
+        >
+          <div className="flex flex-col items-center gap-3 text-center px-4">
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+              <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+            <span className="text-[13px] text-zinc-300 font-medium">Tonton di TikTok</span>
+            <span className="text-[11px] text-zinc-500">Tap untuk membuka video</span>
+          </div>
+        </a>
+      </div>
+    );
+  }
+
+  // Direct iframe embed — same approach as YouTube/Instagram
+  return (
+    <div className="mt-3 w-full rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
+      <div className="relative w-full aspect-[9/16]">
+        <iframe
+          src={`https://www.tiktok.com/embed/v2/${videoId}`}
+          className="absolute inset-0 w-full h-full"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox allow-presentation"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+          title="TikTok Video"
+          style={{ border: 'none' }}
+        />
+      </div>
+      <div className="px-3 py-2 flex items-center gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+        <span className="text-[11px] text-zinc-400">TikTok Video</span>
+      </div>
+    </div>
+  );
+}
+
 export default function RoomMarkers({ rooms }: { rooms: KosRoom[] }) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [resolvedVideoUrl, setResolvedVideoUrl] = useState<string | null>(null);
-  const [isResolvingVideo, setIsResolvingVideo] = useState(false);
 
   const activeRoom = rooms.find((r) => r.id === activeModal);
 
-  // Resolve shortened TikTok URLs via server-side API
-  useEffect(() => {
-    setResolvedVideoUrl(null);
-    setIsResolvingVideo(false);
+  // Determine video type
+  const isTiktok = activeRoom?.video_url ? isTiktokUrl(activeRoom.video_url) : false;
 
-    if (!activeRoom?.video_url) return;
-
-    if (isShortenedTiktokUrl(activeRoom.video_url)) {
-      setIsResolvingVideo(true);
-      fetch('/api/resolve-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: activeRoom.video_url }),
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.resolvedUrl) {
-            setResolvedVideoUrl(data.resolvedUrl);
-          }
-        })
-        .catch(err => {
-          console.error('Failed to resolve video URL:', err);
-        })
-        .finally(() => {
-          setIsResolvingVideo(false);
-        });
-    }
-  }, [activeRoom?.video_url]);
-
-  // Use resolved URL if available, otherwise use original
-  const effectiveVideoUrl = resolvedVideoUrl || activeRoom?.video_url || null;
-
+  // For non-TikTok videos (YouTube, Instagram), use iframe approach
   const videoEmbed = useMemo(() => {
-    if (!effectiveVideoUrl) return null;
-    return getVideoEmbedUrl(effectiveVideoUrl);
-  }, [effectiveVideoUrl]);
+    if (!activeRoom?.video_url || isTiktok) return null;
+    return getVideoEmbedUrl(activeRoom.video_url);
+  }, [activeRoom?.video_url, isTiktok]);
 
   return (
     <>
@@ -183,18 +260,13 @@ export default function RoomMarkers({ rooms }: { rooms: KosRoom[] }) {
               </div>
             )}
             
-            {/* Video Embed */}
-            {isResolvingVideo && (
-              <div className="mt-3 w-full rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
-                <div className="relative w-full aspect-[9/16] flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    <span className="text-[12px] text-zinc-400">Memuat video...</span>
-                  </div>
-                </div>
-              </div>
+            {/* Video Embed — TikTok uses oEmbed approach */}
+            {isTiktok && activeRoom.video_url && (
+              <TikTokEmbed videoUrl={activeRoom.video_url} />
             )}
-            {!isResolvingVideo && videoEmbed && (
+
+            {/* Video Embed — YouTube / Instagram uses iframe approach */}
+            {!isTiktok && videoEmbed && (
               <div className="mt-3 w-full rounded-[16px] md:rounded-[20px] overflow-hidden bg-black/50 border border-white/10 shadow-inner">
                 <div className="relative w-full aspect-[9/16]">
                   <iframe

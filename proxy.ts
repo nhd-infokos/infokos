@@ -38,23 +38,65 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // If not logged in and trying to access admin (but not login page)
-  if (!user && isAdminRoute && !isLoginPage) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/admin/login"
-    return NextResponse.redirect(url)
+  // --- Admin page routes ---
+  if (isAdminRoute) {
+    // Login page handling
+    if (isLoginPage) {
+      // If already logged in, check if admin and redirect to dashboard
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+
+        if (profile?.role === 'admin') {
+          const url = request.nextUrl.clone()
+          url.pathname = "/admin/kos"
+          return NextResponse.redirect(url)
+        }
+      }
+      return supabaseResponse
+    }
+
+    // All other /admin/* routes require admin auth
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/admin/login"
+      return NextResponse.redirect(url)
+    }
+
+    // Check admin role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      // Not admin — sign out and redirect to admin login with error
+      const url = request.nextUrl.clone()
+      url.pathname = "/admin/login"
+      url.searchParams.set('error', 'unauthorized')
+      return NextResponse.redirect(url)
+    }
   }
 
-  // If not logged in and trying to access admin API
-  if (!user && isAdminApi) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  // --- Admin API routes ---
+  if (isAdminApi) {
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized: Not authenticated" }, { status: 401 })
+    }
 
-  // If logged in and on login page, redirect to admin
-  if (user && isLoginPage) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/admin/kos"
-    return NextResponse.redirect(url)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 })
+    }
   }
 
   return supabaseResponse
