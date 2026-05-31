@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function AdminLogin() {
+function AdminLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createSupabaseBrowserClient();
@@ -103,3 +103,16 @@ export default function AdminLogin() {
     </div>
   );
 }
+
+export default function AdminLogin() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+      </div>
+    }>
+      <AdminLoginContent />
+    </Suspense>
+  );
+}
+
